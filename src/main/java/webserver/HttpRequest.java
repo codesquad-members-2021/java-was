@@ -53,4 +53,8 @@ public class HttpRequest {
         // TODO: BODY
         return httpRequest;
     }
+
+    public String query(String key) {
+        return "";
+    }
 }
