@@ -37,7 +37,6 @@ class HttpRequestTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        assertThat(httpRequest.url()).isEqualTo("/index.html");
-
+        assertThat(httpRequest.getUrl()).isEqualTo("/index.html");
     }
 }
