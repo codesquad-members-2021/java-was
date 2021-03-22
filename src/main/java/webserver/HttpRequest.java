@@ -16,6 +16,7 @@ public class HttpRequest {
     private String protocol;
 
     private Map<String, String> headers = new HashMap<>();
+    private Map<String, String> query;
 
     private HttpRequest() {
 
@@ -30,6 +31,11 @@ public class HttpRequest {
         method = startLine[0];
         url = startLine[1];
         protocol = startLine[2];
+
+        String[] queryString = url.split("\\?");
+        if (queryString.length > 1) {
+            query = HttpRequestUtils.parseQueryString(queryString[1]);
+        }
     }
 
     public void addHeaders(String buffer) {
@@ -55,6 +61,6 @@ public class HttpRequest {
     }
 
     public String query(String key) {
-        return "";
+        return query.get(key);
     }
 }
