@@ -24,19 +24,7 @@ class HttpRequestTest {
     @DisplayName("리퀘스트 객체를 생성")
     public void createRequest() {
         InputStream in = new ByteArrayInputStream(request.getBytes());
-        HttpRequest httpRequest = new HttpRequest();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
-            String buffer;
-            buffer = br.readLine();
-            httpRequest.addStartLine(buffer);
-            while(!(buffer = br.readLine()).equals("")) {
-                httpRequest.addHeaders(buffer);
-            }
-            // TODO: BODY
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        HttpRequest httpRequest = HttpRequest.of(in);
         assertThat(httpRequest.getUrl()).isEqualTo("/index.html");
     }
 }

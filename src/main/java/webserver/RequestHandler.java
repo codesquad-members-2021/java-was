@@ -22,18 +22,9 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-
-            String buffer;
-            String[] getURL = null;
-            while (!((buffer = br.readLine()).equals(""))){
-                log.debug(buffer);
-                getURL = buffer.split(" ");
-                break;
-            }
-            byte[] body = Files.readAllBytes(new File("./webapp" + getURL[1]).toPath());
+            HttpRequest httpRequest = HttpRequest.of(in);
+            byte[] body = Files.readAllBytes(new File("./webapp" + httpRequest.getUrl()).toPath());
             DataOutputStream dos = new DataOutputStream(out);
-//            byte[] body = "Hello World".getBytes();
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
