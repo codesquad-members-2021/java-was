@@ -20,3 +20,4 @@
 * [동영상으로 살펴보는 코드스쿼드의 온라인 코드 리뷰 과정](https://youtu.be/a5c9ku-_fok)
 
 ## 풀 리퀘스트 테스트
+* 제인 Repository를 clone해서 step1-s branch 생성 후 dev branch에 PR
