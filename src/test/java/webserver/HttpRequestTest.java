@@ -1,7 +1,5 @@
 package webserver;
 
-import static org.assertj.core.api.Assertions.*;
-
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,9 +43,9 @@ class HttpRequestTest {
                 "Accept: */*\r\n\r\n";
         InputStream in = new ByteArrayInputStream(request.getBytes());
         HttpRequest httpRequest = HttpRequest.of(in);
-        softly.assertThat(httpRequest.query("userId")).as("User ID").isEqualTo("javajigi");
-        softly.assertThat(httpRequest.query("password")).as("Password").isEqualTo("password");
-        softly.assertThat(httpRequest.query("name")).as("Name").isEqualTo("%EB%B0%95%EC%9E%AC%EC%84%B1");
-        softly.assertThat(httpRequest.query("email")).as("Email").isEqualTo("javajigi%40slipp.net");
+        softly.assertThat(httpRequest.data("userId")).as("User ID").isEqualTo("javajigi");
+        softly.assertThat(httpRequest.data("password")).as("Password").isEqualTo("password");
+        softly.assertThat(httpRequest.data("name")).as("Name").isEqualTo("%EB%B0%95%EC%9E%AC%EC%84%B1");
+        softly.assertThat(httpRequest.data("email")).as("Email").isEqualTo("javajigi%40slipp.net");
     }
 }

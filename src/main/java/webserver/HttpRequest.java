@@ -1,6 +1,7 @@
 package webserver;
 
 import util.HttpRequestUtils;
+import util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,15 +13,17 @@ import java.util.Map;
 public class HttpRequest {
 
     private String url;
-    private String method;
+    private HttpMethod method;
     private String protocol;
 
     private Map<String, String> headers = new HashMap<>();
-    private Map<String, String> query;
+    private Map<String, String> data;
+    private String body;
 
     private HttpRequest() {
 
     }
+
 
     public String getUrl() {
         return url;
@@ -28,14 +31,15 @@ public class HttpRequest {
 
     public void addStartLine(String buffer) {
         String[] startLine = buffer.split(" ");
-        method = startLine[0];
+        method = HttpMethod.valueOf(startLine[0].toUpperCase());
         url = startLine[1];
         protocol = startLine[2];
 
         String[] target = startLine[1].split("\\?");
         url = target[0];
-        if (target.length > 1) {
-            query = HttpRequestUtils.parseQueryString(target[1]);
+
+        if (target.length > 1 && method == HttpMethod.GET) {
+            data = HttpRequestUtils.parseQueryString(target[1]);
         }
     }
 
@@ -51,17 +55,41 @@ public class HttpRequest {
         try {
             buffer = br.readLine();
             httpRequest.addStartLine(buffer);
-            while(!(buffer = br.readLine()).equals("")) {
+            while (!(buffer = br.readLine()).equals("")) {
                 httpRequest.addHeaders(buffer);
             }
+
+            String contentLength = httpRequest.header("Content-Length");
+            if (contentLength != null) {
+                httpRequest.addBody(IOUtils.readData(br, Integer.parseInt(contentLength)));
+            }
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // TODO: BODY
+
+
         return httpRequest;
     }
 
-    public String query(String key) {
-        return query.get(key);
+    private void addBody(String readData) {
+        body = readData;
+        if (method == HttpMethod.POST) {
+            data = HttpRequestUtils.parseQueryString(readData);
+        }
+
+    }
+
+    public String header(String key) {
+        return headers.get(key);
+    }
+
+    public HttpMethod getMethod() {
+        return method;
+    }
+
+    public String data(String key) {
+        return data.get(key);
     }
 }

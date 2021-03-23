@@ -28,12 +28,14 @@ public class RequestHandler extends Thread {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             HttpRequest httpRequest = HttpRequest.of(in);
             String url = httpRequest.getUrl();
+
+
             if ("/user/create".equals(url)) {
                 User user = new User(
-                        httpRequest.query("userId"),
-                        httpRequest.query("password"),
-                        httpRequest.query("name"),
-                        httpRequest.query("email")
+                        httpRequest.data("userId"),
+                        httpRequest.data("password"),
+                        httpRequest.data("name"),
+                        httpRequest.data("email")
                 );
                 users.add(user);
                 log.debug("user : {}", user);
