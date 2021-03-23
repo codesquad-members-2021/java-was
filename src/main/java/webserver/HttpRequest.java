@@ -32,9 +32,10 @@ public class HttpRequest {
         url = startLine[1];
         protocol = startLine[2];
 
-        String[] queryString = url.split("\\?");
-        if (queryString.length > 1) {
-            query = HttpRequestUtils.parseQueryString(queryString[1]);
+        String[] target = startLine[1].split("\\?");
+        url = target[0];
+        if (target.length > 1) {
+            query = HttpRequestUtils.parseQueryString(target[1]);
         }
     }
 
