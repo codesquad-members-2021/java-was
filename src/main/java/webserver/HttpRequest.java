@@ -78,7 +78,6 @@ public class HttpRequest {
         if (method == HttpMethod.POST) {
             data = HttpRequestUtils.parseQueryString(readData);
         }
-
     }
 
     public String header(String key) {
@@ -92,4 +91,8 @@ public class HttpRequest {
     public String data(String key) {
         return data.get(key);
     }
+
+//    public boolean loginCookie(){
+//
+//    }
 }
