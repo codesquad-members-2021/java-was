@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.util.List;
 
+import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,11 +14,9 @@ public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
-    private List<User> users;
 
-    public RequestHandler(Socket connectionSocket, List<User> users) {
+    public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
-        this.users = users;
     }
 
     public void run() {
@@ -29,7 +28,7 @@ public class RequestHandler extends Thread {
             HttpRequest httpRequest = HttpRequest.of(in);
             String url = httpRequest.getUrl();
 
-
+            DataOutputStream dos = new DataOutputStream(out);
             if ("/user/create".equals(url)) {
                 User user = new User(
                         httpRequest.data("userId"),
@@ -37,17 +36,40 @@ public class RequestHandler extends Thread {
                         httpRequest.data("name"),
                         httpRequest.data("email")
                 );
-                users.add(user);
+                DataBase.addUser(user);
                 log.debug("user : {}", user);
-                DataOutputStream dos = new DataOutputStream(out);
                 response302Header(dos);
+            } else if ("/user/login".equals(url)) {
+                User user = DataBase.findUserById(httpRequest.data("userId"));
+                if (user == null) {
+                    log.debug("Not Found");
+                    response302HeaderWithCookie(dos, "logined=false");
+                } else if (user.checkPassword(httpRequest.data("password"))) {
+                    log.debug("Login success");
+                    response302HeaderWithCookie(dos, "logined=true");
+                } else {
+                    log.debug("Password was not matched");
+                    response302HeaderWithCookie(dos, "logined=false");
+                }
+
+
             } else {
                 byte[] body = Files.readAllBytes(new File("./webapp" + httpRequest.getUrl()).toPath());
-                DataOutputStream dos = new DataOutputStream(out);
                 response200Header(dos, body.length);
                 responseBody(dos, body);
             }
 
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void response302HeaderWithCookie(DataOutputStream dos, String cookie) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
+            dos.writeBytes("Location: /index.html\r\n");
+            dos.writeBytes("Set-Cookie: " + cookie + "\r\n");
+            dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
         }
