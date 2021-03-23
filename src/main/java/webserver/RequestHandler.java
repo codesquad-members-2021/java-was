@@ -3,7 +3,9 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.List;
 
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,9 +13,11 @@ public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
+    private List<User> users;
 
-    public RequestHandler(Socket connectionSocket) {
+    public RequestHandler(Socket connectionSocket, List<User> users) {
         this.connection = connectionSocket;
+        this.users = users;
     }
 
     public void run() {
@@ -23,10 +27,28 @@ public class RequestHandler extends Thread {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             HttpRequest httpRequest = HttpRequest.of(in);
-            byte[] body = Files.readAllBytes(new File("./webapp" + httpRequest.getUrl()).toPath());
-            DataOutputStream dos = new DataOutputStream(out);
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            String url = httpRequest.getUrl();
+            if ("/user/create".equals(url)) {
+                User user = new User(
+                        httpRequest.query("userId"),
+                        httpRequest.query("password"),
+                        httpRequest.query("name"),
+                        httpRequest.query("email")
+                );
+                users.add(user);
+                log.debug("user : {}", user);
+                //TODO REDIRECT
+                byte[] body = Files.readAllBytes(new File("./webapp/index.html").toPath());
+                DataOutputStream dos = new DataOutputStream(out);
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            } else {
+                byte[] body = Files.readAllBytes(new File("./webapp" + httpRequest.getUrl()).toPath());
+                DataOutputStream dos = new DataOutputStream(out);
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            }
+
         } catch (IOException e) {
             log.error(e.getMessage());
         }
