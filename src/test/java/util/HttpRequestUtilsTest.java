@@ -68,18 +68,20 @@ class HttpRequestUtilsTest {
 
     @ParameterizedTest
     @MethodSource
-    void parseCookies(String cookies, String expectedParameterName, String expectedParameterValue) {
+    void parseCookies(String cookies, String expectedLogined, String expectedJSessionId, String expectedSession) {
         Map<String, String> parameters = HttpRequestUtils.parseCookies(cookies);
 
-        assertThat(parameters.get(expectedParameterName)).isEqualTo(expectedParameterValue);
+        assertAll(
+                () -> assertThat(parameters.get("logined")).isEqualTo(expectedLogined),
+                () -> assertThat(parameters.get("JSessionId")).isEqualTo(expectedJSessionId),
+                () -> assertThat(parameters.get("session")).isEqualTo(expectedSession)
+        );
     }
 
     @SuppressWarnings("unused")
     static Stream<Arguments> parseCookies() {
         return Stream.of(
-                Arguments.of("logined=true; JSessionId=1234", "logined", "true"),
-                Arguments.of("logined=true; JSessionId=1234", "JSessionId", "1234"),
-                Arguments.of("logined=true; JSessionId=1234", "session", null)
+                Arguments.of("logined=true; JSessionId=1234", "true", "1234", null)
         );
     }
 
