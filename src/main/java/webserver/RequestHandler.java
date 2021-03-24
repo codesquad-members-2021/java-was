@@ -3,9 +3,7 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import db.DataBase;
 import model.User;
@@ -29,7 +27,7 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 
             String line = br.readLine();
             System.out.println(line);
@@ -54,11 +52,11 @@ public class RequestHandler extends Thread {
                 Map<String, String> info = HttpRequestUtils.parseQueryString(RequestBody);
                 log.info("user : {}", info.toString());
                 DataBase.addUser(new User(info.get("userId"), info.get("password"), info.get("name"), info.get("email")));
-                log.info("new user : {}", DataBase.findUserById("trevi").toString());
+//                log.info("new user : {}", DataBase.findUserById("trevi").toString());
                 response302Header(dos, "/index.html");
             } else if (url.startsWith("/login")) {
                 String contentLength = headers.get("Content-Length");
-                log.info("contentLength : {}" , contentLength);
+                log.info("contentLength : {}", contentLength);
                 String RequestBody = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
 
                 Map<String, String> info = HttpRequestUtils.parseQueryString(RequestBody);
@@ -73,15 +71,48 @@ public class RequestHandler extends Thread {
                     log.info("로그인 성공");
                     response302HeaderWithCookie(dos, "/index.html", "logined=true");
                 }
+            } else if (url.startsWith("/list")) {
+                String cookies = headers.get("Cookie");
+                Map<String, String> cookieStringMap = HttpRequestUtils.parseCookies(cookies);
+                log.info("Cookie: {}", cookieStringMap.toString());
+                if (cookieStringMap.get("logined").equals("false")) {
+                    response302Header(dos, "/user/login.html");
+                } else {
+                    url = "/user/list.html";
+                    byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+                    String bodyStr = new String(body);
+                    int tbodyIndex = bodyStr.indexOf("<tbody>");
+                    log.info("bodyStr : {}", bodyStr.substring(0, tbodyIndex + 7));
+
+                    StringBuilder result = new StringBuilder(bodyStr.substring(0, tbodyIndex + 7));
+                    Collection<User> users = DataBase.findAll();
+                    int id = 0;
+                    for (User user : users) {
+                        id++;
+                        result.append("<tr><th scope=\"row\">")
+                                .append(id).append("</th> <td>")
+                                .append(user.getUserId()).append("</td> <td>")
+                                .append(user.getName()).append("</td> <td>")
+                                .append(user.getEmail()).append("</td> <td>")
+                                .append("<a href=\"#\" class=\"btn btn - success\" role=\"button\">수정</a></td>");
+                    }
+//                    response302Header(dos, "/user/list.html");
+                    result.append(bodyStr.substring(tbodyIndex + 7));
+                    log.info("result: {}", result.toString());
+                    response200Header(dos, result.toString().getBytes().length);
+                    responseBody(dos, result.toString().getBytes());
+                }
             } else {
                 byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
                 response200Header(dos, body.length);
                 responseBody(dos, body);
             }
 
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             log.error(e.getMessage());
         }
+
     }
 
     private void response302HeaderWithCookie(DataOutputStream dos, String url, String cookie) {
