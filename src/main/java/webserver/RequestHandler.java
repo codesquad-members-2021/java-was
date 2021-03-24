@@ -38,23 +38,31 @@ public class RequestHandler extends Thread {
                 );
                 DataBase.addUser(user);
                 log.debug("user : {}", user);
-                response302Header(dos);
+                response302Header(dos, "/index.html");
             } else if ("/user/login".equals(url)) {
                 User user = DataBase.findUserById(httpRequest.data("userId"));
                 if (user == null) {
                     log.debug("Not Found");
-                    response302HeaderWithCookie(dos, "logined=false");
+                    response302HeaderWithCookie(dos, "/user/login_failed.html", "logined=false", "/");
                 } else if (user.checkPassword(httpRequest.data("password"))) {
                     log.debug("Login success");
-                    response302HeaderWithCookie(dos, "logined=true");
+                    response302HeaderWithCookie(dos, "/index.html", "logined=true", "/");
                 } else {
                     log.debug("Password was not matched");
-                    response302HeaderWithCookie(dos, "logined=false");
+                    response302HeaderWithCookie(dos, "/user/login_failed.html", "logined=false", "/");
                 }
-
-
+            } else if ("/user/list".equals(url)) {
+                log.debug("Cookie : {}", httpRequest.header("Cookie"));
+                if ("true".equals(httpRequest.cookie("logined"))) {
+                    byte[] body = Files.readAllBytes(new File("./webapp" + "/user/list.html").toPath());
+                    response200Header(dos, body.length);
+                    responseBody(dos, body);
+                } else {
+                    response302Header(dos, "/user/login.html");
+                }
             } else {
-                byte[] body = Files.readAllBytes(new File("./webapp" + httpRequest.getUrl()).toPath());
+                log.debug("Cookie : {}", httpRequest.header("Cookie"));
+                byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
                 response200Header(dos, body.length);
                 responseBody(dos, body);
             }
@@ -64,21 +72,21 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private void response302HeaderWithCookie(DataOutputStream dos, String cookie) {
+    private void response302HeaderWithCookie(DataOutputStream dos, String url, String cookie, String cookiePath) {
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: /index.html\r\n");
-            dos.writeBytes("Set-Cookie: " + cookie + "\r\n");
+            dos.writeBytes("Location: " + url + "\r\n");
+            dos.writeBytes("Set-Cookie: " + cookie + "; Path=" + cookiePath + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
 
-    private void response302Header(DataOutputStream dos) {
+    private void response302Header(DataOutputStream dos, String url) {
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: /index.html\r\n");
+            dos.writeBytes("Location: " + url + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
