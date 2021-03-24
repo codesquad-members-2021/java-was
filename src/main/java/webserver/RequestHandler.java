@@ -43,13 +43,13 @@ public class RequestHandler extends Thread {
                 User user = DataBase.findUserById(httpRequest.data("userId"));
                 if (user == null) {
                     log.debug("Not Found");
-                    response302HeaderWithCookie(dos, "logined=false", "/");
+                    response302HeaderWithCookie(dos, "/user/login_failed.html", "logined=false", "/");
                 } else if (user.checkPassword(httpRequest.data("password"))) {
                     log.debug("Login success");
-                    response302HeaderWithCookie(dos, "logined=true", "/");
+                    response302HeaderWithCookie(dos, "/index.html", "logined=true", "/");
                 } else {
                     log.debug("Password was not matched");
-                    response302HeaderWithCookie(dos, "logined=false", "/");
+                    response302HeaderWithCookie(dos, "/user/login_failed.html", "logined=false", "/");
                 }
             } else if ("/user/list".equals(url)) {
                 log.debug("Cookie : {}", httpRequest.header("Cookie"));
@@ -72,11 +72,11 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private void response302HeaderWithCookie(DataOutputStream dos, String cookie, String path) {
+    private void response302HeaderWithCookie(DataOutputStream dos, String url, String cookie, String cookiePath) {
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: /index.html\r\n");
-            dos.writeBytes("Set-Cookie: " + cookie + "; Path=" + path + "\r\n");
+            dos.writeBytes("Location: " + url + "\r\n");
+            dos.writeBytes("Set-Cookie: " + cookie + "; Path=" + cookiePath + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
