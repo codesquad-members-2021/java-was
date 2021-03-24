@@ -1,72 +1,133 @@
 package util;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import util.HttpRequestUtils.Pair;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 
 class HttpRequestUtilsTest {
-    @Test
-    void parseQueryString() {
-        String queryString = "userId=javajigi";
+    @ParameterizedTest
+    @MethodSource
+    void parseQueryString(String queryString, String expectedUserId, String expectedPassword) {
         Map<String, String> parameters = HttpRequestUtils.parseQueryString(queryString);
-        assertThat(parameters.get("userId")).isEqualTo(("javajigi"));
-        assertThat(parameters.get("password")).isNull();
 
-        queryString = "userId=javajigi&password=password2";
-        parameters = HttpRequestUtils.parseQueryString(queryString);
-        assertThat(parameters.get("userId")).isEqualTo(("javajigi"));
-        assertThat(parameters.get("password")).isEqualTo("password2");
+        assertAll(
+                () -> assertThat(parameters.get("userId")).isEqualTo(expectedUserId),
+                () -> assertThat(parameters.get("password")).isEqualTo(expectedPassword)
+        );
     }
 
-    @Test
-    void parseQueryString_null() {
-        Map<String, String> parameters = HttpRequestUtils.parseQueryString(null);
-        assertThat(parameters.isEmpty()).isTrue();
+    @SuppressWarnings("unused")
+    static Stream<Arguments> parseQueryString() {
+        return Stream.of(
+                Arguments.of("userId=javajigi", "javajigi", null),
+                Arguments.of("userId=javajigi&password=password2", "javajigi", "password2")
+        );
+    }
 
-        parameters = HttpRequestUtils.parseQueryString("");
-        assertThat(parameters.isEmpty()).isTrue();
-
-        parameters = HttpRequestUtils.parseQueryString(" ");
+    @ParameterizedTest
+    @MethodSource
+    void parseQueryString_null(Map<String, String> parameters) {
         assertThat(parameters.isEmpty()).isTrue();
     }
 
-    @Test
-    void parseQueryString_invalid() {
-        String queryString = "userId=javajigi&password";
+    @SuppressWarnings("unused")
+    static Stream<Arguments> parseQueryString_null() {
+        return Stream.of(
+                Arguments.of(HttpRequestUtils.parseQueryString(null)),
+                Arguments.of(HttpRequestUtils.parseQueryString("")),
+                Arguments.of(HttpRequestUtils.parseQueryString(" "))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void parseQueryString_invalid(String queryString, String expectedUserId, String expectedPassword) {
         Map<String, String> parameters = HttpRequestUtils.parseQueryString(queryString);
-        assertThat(parameters.get("userId")).isEqualTo("javajigi");
-        assertThat(parameters.get("password")).isNull();
+
+        assertAll(
+                () -> assertThat(parameters.get("userId")).isEqualTo(expectedUserId),
+                () -> assertThat(parameters.get("password")).isEqualTo(expectedPassword)
+        );
     }
 
-    @Test
-    void parseCookies() {
-        String cookies = "logined=true; JSessionId=1234";
+    @SuppressWarnings("unused")
+    static Stream<Arguments> parseQueryString_invalid() {
+        return Stream.of(
+                Arguments.of("userId=javajigi&password", "javajigi", null)
+        );
+    }
+
+
+    @ParameterizedTest
+    @MethodSource
+    void parseCookies(String cookies, String expectedParameterName, String expectedParameterValue) {
         Map<String, String> parameters = HttpRequestUtils.parseCookies(cookies);
-        assertThat(parameters.get("logined")).isEqualTo("true");
-        assertThat(parameters.get("JSessionId")).isEqualTo("1234");
-        assertThat(parameters.get("session")).isNull();
+
+        assertThat(parameters.get(expectedParameterName)).isEqualTo(expectedParameterValue);
     }
 
-    @Test
-    void getKeyValue(){
-        Pair pair = HttpRequestUtils.getKeyValue("userId=javajigi", "=");
-        assertThat(pair).isEqualTo(new Pair("userId", "javajigi"));
+    @SuppressWarnings("unused")
+    static Stream<Arguments> parseCookies() {
+        return Stream.of(
+                Arguments.of("logined=true; JSessionId=1234", "logined", "true"),
+                Arguments.of("logined=true; JSessionId=1234", "JSessionId", "1234"),
+                Arguments.of("logined=true; JSessionId=1234", "session", null)
+        );
     }
 
-    @Test
-    void getKeyValue_invalid(){
-        Pair pair = HttpRequestUtils.getKeyValue("userId", "=");
-        assertThat(pair).isNull();
+    @ParameterizedTest
+    @MethodSource
+    void getKeyValue(Pair pair, Pair expectedPair) {
+        assertThat(pair).isEqualTo(expectedPair);
     }
 
-    @Test
-    void parseHeader(){
-        String header = "Content-Length: 59";
-        Pair pair = HttpRequestUtils.parseHeader(header);
-        assertThat(pair).isEqualTo(new Pair("Content-Length", "59"));
+    @SuppressWarnings("unused")
+    static Stream<Arguments> getKeyValue() {
+        return Stream.of(
+                Arguments.of(
+                        HttpRequestUtils.getKeyValue("userId=javajigi", "="),
+                        new Pair("userId", "javajigi")
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void getKeyValue_invalid(Pair pair, Pair expectedPair) {
+        assertThat(pair).isEqualTo(expectedPair);
+    }
+
+    @SuppressWarnings("unused")
+    static Stream<Arguments> getKeyValue_invalid() {
+        return Stream.of(
+                Arguments.of(
+                        HttpRequestUtils.getKeyValue("userId", "="),
+                        null
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void parseHeader(Pair pair, Pair expectedPair) {
+        assertThat(pair).isEqualTo(expectedPair);
+    }
+
+    @SuppressWarnings("unused")
+    static Stream<Arguments> parseHeader() {
+        return Stream.of(
+                Arguments.of(
+                        HttpRequestUtils.parseHeader("Content-Length: 59"),
+                        new Pair("Content-Length", "59")
+                )
+        );
     }
 }
