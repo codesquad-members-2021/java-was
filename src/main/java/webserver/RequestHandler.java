@@ -46,18 +46,31 @@ public class RequestHandler extends Thread {
 
             log.info(Arrays.toString(tokens));
             String url = tokens[1];
+            log.info("url: {}", url);
+            DataOutputStream dos = new DataOutputStream(out);
+
             if (url.startsWith("/user/create")) {
                 String RequestBody = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
                 Map<String, String> info = HttpRequestUtils.parseQueryString(RequestBody);
                 log.info("user : {}", info.toString());
                 DataBase.addUser(new User(info.get("userId"), info.get("password"), info.get("name"), info.get("email")));
                 log.info("new user : {}", DataBase.findUserById("trevi").toString());
+                response302Header(dos, "/index.html");
+            } else {
+                byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+                response200Header(dos, body.length);
+                responseBody(dos, body);
             }
-            byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-            log.info("url: {}", url);
-            DataOutputStream dos = new DataOutputStream(out);
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos, String url) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: http://localhost:8080" + url + "\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
         }
