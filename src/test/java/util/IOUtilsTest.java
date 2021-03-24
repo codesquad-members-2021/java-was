@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class IOUtilsTest {
-    private static final Logger logger = LoggerFactory.getLogger(IOUtilsTest.class);
 
     @ParameterizedTest
     @MethodSource
