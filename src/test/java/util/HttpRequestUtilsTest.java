@@ -64,8 +64,6 @@ class HttpRequestUtilsTest {
                 Arguments.of("userId=javajigi&password", "javajigi", null)
         );
     }
-
-
     @ParameterizedTest
     @MethodSource
     void parseCookies(String cookies, String expectedLogined, String expectedJSessionId, String expectedSession) {
