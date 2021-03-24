@@ -17,6 +17,7 @@ public class HttpRequest {
     private String protocol;
 
     private Map<String, String> headers = new HashMap<>();
+    private Map<String, String> cookies = null;
     private Map<String, String> data;
     private String body;
 
@@ -46,6 +47,10 @@ public class HttpRequest {
     public void addHeaders(String buffer) {
         HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(buffer);
         headers.put(pair.getKey(), pair.getValue());
+        String cookies;
+        if ((cookies = headers.get("Cookie")) != null) {
+            this.cookies = HttpRequestUtils.parseCookies(cookies);
+        }
     }
 
     public static HttpRequest of(InputStream in) {
@@ -82,6 +87,13 @@ public class HttpRequest {
 
     public String header(String key) {
         return headers.get(key);
+    }
+
+    public String cookie(String key) {
+        if (cookies == null) {
+            return null;
+        }
+        return cookies.get(key);
     }
 
     public HttpMethod getMethod() {
