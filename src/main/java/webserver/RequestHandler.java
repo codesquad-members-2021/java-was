@@ -19,7 +19,6 @@ public class RequestHandler extends Thread {
         this.connection = connectionSocket;
     }
 
-    private Map<String, String> queryStrings = new HashMap<>();
 
     public void run() {
         log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
@@ -36,12 +35,7 @@ public class RequestHandler extends Thread {
             log.info("url : {}", url);
 
             if(url.startsWith("/user/create")) {
-                int i = url.indexOf('?');
-                String[] split = url.substring(i + 1, url.length()).split("&");
-                for(String query : split) {
-                    String[] ss = query.split("=");
-                    queryStrings.put(ss[0], ss[1]);
-                }
+                Map<String , String> queryStrings = parseQueryString(url);
                 User user = new User(queryStrings.get("userId"), queryStrings.get("password"), queryStrings.get("name"), queryStrings.get("email"));
                 log.debug("user : {}", user);
             }
@@ -74,5 +68,16 @@ public class RequestHandler extends Thread {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private Map<String, String> parseQueryString(String url) {
+        Map<String, String> queryStrings = new HashMap<>();
+        int i = url.indexOf('?');
+        String[] split = url.substring(i + 1, url.length()).split("&");
+        for(String query : split) {
+            String[] ss = query.split("=");
+            queryStrings.put(ss[0], ss[1]);
+        }
+        return queryStrings;
     }
 }
