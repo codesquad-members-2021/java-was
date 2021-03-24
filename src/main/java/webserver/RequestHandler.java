@@ -28,6 +28,7 @@ public class RequestHandler extends Thread {
             HttpRequest httpRequest = HttpRequest.of(in);
             String url = httpRequest.getUrl();
 
+
             DataOutputStream dos = new DataOutputStream(out);
             if ("/user/create".equals(url)) {
                 User user = new User(
@@ -55,7 +56,7 @@ public class RequestHandler extends Thread {
                 log.debug("Cookie : {}", httpRequest.header("Cookie"));
                 if ("true".equals(httpRequest.cookie("logined"))) {
                     byte[] body = Files.readAllBytes(new File("./webapp" + "/user/list.html").toPath());
-                    response200Header(dos, body.length);
+                    response200Header(dos, body.length, "html");
                     responseBody(dos, body);
                 } else {
                     response302Header(dos, "/user/login.html");
@@ -63,7 +64,13 @@ public class RequestHandler extends Thread {
             } else {
                 log.debug("Cookie : {}", httpRequest.header("Cookie"));
                 byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-                response200Header(dos, body.length);
+
+                if (url.endsWith(".css")){
+                    response200Header(dos, body.length, "css");
+                }else {
+                    response200Header(dos, body.length, "html");
+                }
+
                 responseBody(dos, body);
             }
 
@@ -93,10 +100,10 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: text/" + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
