@@ -1,128 +1,24 @@
 package webserver;
 
-import util.HttpRequestUtils;
-
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 public class RequestHeader extends Header {
-    private String cookie;
-    private String method;
-    private String path;
-    private String host;
+    private static final String METHOD_KEY = "method";
+    private static final String PATH_KEY = "path";
 
-    public RequestHeader(String protocolVersion, String cookie, String method, String path, String host) {
-        super(protocolVersion);
-        this.cookie = cookie;
-        this.method = method;
-        this.path = path;
-        this.host = host;
-    }
-
-    public static RequestHeader from(String headerText) {
-        String[] splittedHeaderTexts = headerText.split(System.lineSeparator());
-
-        Builder builder = new Builder();
-        List<HttpRequestUtils.Pair> pairs = new ArrayList<>();
-
-        for (String splittedHeaderText : splittedHeaderTexts) {
-            pairs.add(HttpRequestUtils.parseHeader(splittedHeaderText));
-
-            HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(splittedHeaderText);
-
-            if (pair != null && pair.getKey().equals("Host")) {
-                builder.host(pair.getValue());
-            }
-            if (pair != null && pair.getKey().equals("Cookie")) {
-                builder.cookie(pair.getValue());
-            }
-        }
-
-        String[] statusLine = splittedHeaderTexts[0].split(" ");
-
-        builder.method(statusLine[0]);
-        builder.path(statusLine[1]);
-        builder.protocolVersion(statusLine[2]);
-
-        return builder.build();
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private String protocolVersion;
-        private String cookie;
-        private String method;
-        private String path;
-        private String host;
-
-        public Builder protocolVersion(String protocolVersion) {
-            this.protocolVersion = protocolVersion;
-            return this;
-        }
-
-        public Builder cookie(String cookie) {
-            this.cookie = cookie;
-            return this;
-        }
-
-        public Builder method(String method) {
-            this.method = method;
-            return this;
-        }
-
-        public Builder path(String path) {
-            this.path = path;
-            return this;
-        }
-
-        public Builder host(String host) {
-            this.host = host;
-            return this;
-        }
-
-        public RequestHeader build() {
-            return new RequestHeader(protocolVersion, cookie, method, path, host);
-        }
-    }
-
-    private String startLine() {
-        return method + " " + path + " " + super.getProtocolVersion();
-    }
-
-    private String host() {
-        return "Host: " + host;
-    }
-
-    private String cookie() {
-        return "Cookie: " + cookie;
-    }
-
-    public byte[] toByte() {
-        return new StringBuilder()
-                .append(startLine()).append(System.lineSeparator())
-                .append(host()).append(System.lineSeparator())
-                .append(cookie()).append(System.lineSeparator())
-                .append(System.lineSeparator())
-                .toString()
-                .getBytes(StandardCharsets.UTF_8);
+    public RequestHeader(Map<String, String> attributes) {
+        super(attributes);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        RequestHeader that = (RequestHeader) o;
-        return Objects.equals(cookie, that.cookie) && Objects.equals(method, that.method) && Objects.equals(path, that.path) && Objects.equals(host, that.host);
+    protected void putStatusLine(String[] statusLine) {
+        statusLineAttributes.put(METHOD_KEY, statusLine[0]);
+        statusLineAttributes.put(PATH_KEY, statusLine[1]);
+        statusLineAttributes.put(PROTOCOL_VERSION_KEY, statusLine[2]);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), cookie, method, path, host);
+    protected String statusLine() {
+        return statusLineAttributes.get(METHOD_KEY) + " " + statusLineAttributes.get(PATH_KEY) + " " + statusLineAttributes.get(PROTOCOL_VERSION_KEY);
     }
 }

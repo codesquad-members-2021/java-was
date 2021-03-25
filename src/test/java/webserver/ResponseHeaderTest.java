@@ -5,33 +5,58 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ResponseHeaderTest {
     @ParameterizedTest
     @MethodSource
-    void from(String headerText, ResponseHeader expectedHeader) {
-        assertThat(ResponseHeader.from(headerText))
-                .isEqualTo(expectedHeader);
+    void getAttributes(String headerText, Map<String, String> expectedAttributes) {
+        assertThat(ResponseHeader.of(headerText, "response").getAttributes())
+                .isEqualTo(expectedAttributes);
     }
 
     @SuppressWarnings("unused")
-    static Stream<Arguments> from() {
+    static Stream<Arguments> getAttributes() {
         return Stream.of(
                 Arguments.of(
-                        "HTTP/1.1 200 OK " + System.lineSeparator() +
+                        "HTTP/1.1 200 OK" + System.lineSeparator() +
                                 "Content-Type: text/html;charset=utf-8" + System.lineSeparator() +
                                 "Content-Length: " + "Hello World".getBytes().length + System.lineSeparator() +
                                 System.lineSeparator(),
-                        ResponseHeader.builder()
-                                .protocolVersion("HTTP/1.1")
-                                .statusCode("200")
-                                .statusText("OK")
-                                .contentType("text/html;charset=utf-8")
-                                .contentLength("Hello World".getBytes().length)
-                                .build()
+                        new LinkedHashMap() {{
+                            put("Content-Type", "text/html;charset=utf-8");
+                            put("Content-Length", String.valueOf("Hello World".getBytes().length));
+                        }}
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void getStatusLineAttributes(String headerText, Map<String, String> expectedAttributes) {
+        assertThat(Header.of(headerText, "response").getStatusLineAttributes())
+                .isEqualTo(expectedAttributes);
+    }
+
+    @SuppressWarnings("unused")
+    static Stream<Arguments> getStatusLineAttributes() {
+        return Stream.of(
+                Arguments.of(
+                        "HTTP/1.1 200 OK" + System.lineSeparator() +
+                                "Content-Type: text/html;charset=utf-8" + System.lineSeparator() +
+                                "Content-Length: " + "Hello World".getBytes().length + System.lineSeparator() +
+                                System.lineSeparator(),
+                        new HashMap() {{
+                            put("protocolVersion", "HTTP/1.1");
+                            put("statusText", "OK");
+                            put("statusCode", "200");
+                        }}
                 )
         );
     }
@@ -39,19 +64,23 @@ class ResponseHeaderTest {
     @ParameterizedTest
     @MethodSource
     void toByte(String headerText, byte[] expectedHeaderByte) {
-        assertThat(ResponseHeader.from(headerText).toByte())
-                .isEqualTo(expectedHeaderByte);
+        byte[] headerByte = Header.of(headerText, "response").toByte();
+
+        assertAll(
+                () -> assertThat(headerByte).isEqualTo(expectedHeaderByte),
+                () -> assertThat(new String(headerByte)).isEqualTo(new String(expectedHeaderByte))
+        );
     }
 
     @SuppressWarnings("unused")
     static Stream<Arguments> toByte() {
         return Stream.of(
                 Arguments.of(
-                        "HTTP/1.1 200 OK " + System.lineSeparator() +
+                        "HTTP/1.1 200 OK" + System.lineSeparator() +
                                 "Content-Type: text/html;charset=utf-8" + System.lineSeparator() +
                                 "Content-Length: " + "Hello World".getBytes().length + System.lineSeparator() +
                                 System.lineSeparator(),
-                        ("HTTP/1.1 200 OK " + System.lineSeparator() +
+                        ("HTTP/1.1 200 OK" + System.lineSeparator() +
                                 "Content-Type: text/html;charset=utf-8" + System.lineSeparator() +
                                 "Content-Length: " + "Hello World".getBytes().length + System.lineSeparator() +
                                 System.lineSeparator()).getBytes(StandardCharsets.UTF_8)

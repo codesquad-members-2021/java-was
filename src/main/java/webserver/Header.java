@@ -1,28 +1,84 @@
 package webserver;
 
-import java.util.Objects;
+import util.HttpRequestUtils;
 
-public class Header {
-    private String protocolVersion;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-    public Header(String protocolVersion) {
-        this.protocolVersion = protocolVersion;
+public abstract class Header {
+    protected static final String PROTOCOL_VERSION_KEY = "protocolVersion";
+
+    protected Map<String, String> statusLineAttributes;
+    private Map<String, String> attributes;
+
+    public Header(Map<String, String> attributes) {
+        this.attributes = attributes;
+        this.statusLineAttributes = new HashMap<>();
     }
 
-    public String getProtocolVersion() {
-        return protocolVersion;
+    public static Header of(String headerText, String type) {
+        Map<String, String> attributes = attributeFrom(headerText);
+
+        String[] splittedHeaderTexts = headerText.split(System.lineSeparator());
+        String[] statusLine = splittedHeaderTexts[0].split(" ");
+
+        Header header = of(attributes, type);
+        header.putStatusLine(statusLine);
+
+        return header;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Header header = (Header) o;
-        return Objects.equals(protocolVersion, header.protocolVersion);
+    private static Header of(Map<String, String> attributes, String type) {
+        switch (type) {
+            case "request":
+                return new RequestHeader(attributes);
+            case "response":
+                return new ResponseHeader(attributes);
+            default:
+                throw new IllegalStateException("Unexpected value: " + type);
+        }
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(protocolVersion);
+    private static Map<String, String> attributeFrom(String headerText) {
+        Map<String, String> attributes = new LinkedHashMap<>();
+
+        String[] splittedHeaderTexts = headerText.split(System.lineSeparator());
+        for (String splittedHeaderText : splittedHeaderTexts) {
+            HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(splittedHeaderText);
+
+            if (pair != null) {
+                attributes.put(pair.getKey(), pair.getValue());
+            }
+        }
+
+        return attributes;
     }
+
+    protected abstract void putStatusLine(String[] statusLine);
+
+    public Map<String, String> getAttributes() {
+        return attributes;
+    }
+
+    public Map<String, String> getStatusLineAttributes() {
+        return statusLineAttributes;
+    }
+
+    public byte[] toByte() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(statusLine()).append(System.lineSeparator());
+
+        for (Map.Entry<String, String> entry : getAttributes().entrySet()) {
+            sb.append(entry.getKey() + ": " + entry.getValue() + System.lineSeparator());
+        }
+
+        sb.append(System.lineSeparator());
+
+        return sb.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    protected abstract String statusLine();
 }
