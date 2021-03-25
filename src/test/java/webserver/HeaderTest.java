@@ -25,14 +25,13 @@ class HeaderTest {
                                 "Content-Type: text/html;charset=utf-8" + System.lineSeparator() +
                                 "Content-Length: " + "Hello World".getBytes().length + System.lineSeparator() +
                                 System.lineSeparator(),
-//                        Header.builder()
-//                                .protocolVersion("HTTP/1.1")
-//                                .statusCode("200")
-//                                .statusText("OK")
-//                                .contentType("text/html;charset=utf-8")
-//                                .contentLength("Hello World".getL())
-//                                .build()
-                        new Header("HTTP/1.1", "200", "OK", "text/html;charset=utf-8", "Hello World".getBytes().length)
+                        Header.builder()
+                                .protocolVersion("HTTP/1.1")
+                                .statusCode("200")
+                                .statusText("OK")
+                                .contentType("text/html;charset=utf-8")
+                                .contentLength("Hello World".getBytes().length)
+                                .build()
                 )
         );
     }

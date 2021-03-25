@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class Header {
-
     private String protocolVersion;
     private String statusCode;
     private String statusText;
@@ -25,32 +24,71 @@ public class Header {
     public static Header from(String headerText) {
         String[] splittedHeaderTexts = headerText.split(System.lineSeparator());
 
+        Builder builder = new Builder();
         List<HttpRequestUtils.Pair> pairs = new ArrayList<>();
 
-        String protocolVersion = "";
-        String statusCode = "";
-        String statusText = "";
-        String contentType = "";
-        int contentLength = -1;
 
         for (String splittedHeaderText : splittedHeaderTexts) {
             pairs.add(HttpRequestUtils.parseHeader(splittedHeaderText));
 
             HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(splittedHeaderText);
 
-            if (pair != null) {
-                contentType = pair.getKey().equals("Content-Type") ? pair.getValue() : contentType;
-                contentLength = pair.getKey().equals("Content-Length") ? Integer.parseInt(pair.getValue()) : contentLength;
+            if (pair != null && pair.getKey().equals("Content-Type")) {
+                builder.contentType(pair.getValue());
+            }
+            if (pair != null && pair.getKey().equals("Content-Length")) {
+                builder.contentLength(Integer.parseInt(pair.getValue()));
             }
         }
 
         String[] statusLine = splittedHeaderTexts[0].split(" ");
 
-        protocolVersion = statusLine[0];
-        statusCode = statusLine[1];
-        statusText = statusLine[2];
+        builder.protocolVersion(statusLine[0]);
+        builder.statusCode(statusLine[1]);
+        builder.statusText(statusLine[2]);
 
-        return new Header(protocolVersion, statusCode, statusText, contentType, contentLength);
+        return builder.build();
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private String protocolVersion;
+        private String statusCode;
+        private String statusText;
+        private String contentType;
+        private int contentLength;
+
+        public Builder protocolVersion(String protocolVersion) {
+            this.protocolVersion = protocolVersion;
+            return this;
+        }
+
+        public Builder statusCode(String statusCode) {
+            this.statusCode = statusCode;
+            return this;
+        }
+
+        public Builder statusText(String statusText) {
+            this.statusText = statusText;
+            return this;
+        }
+
+        public Builder contentType(String contentType) {
+            this.contentType = contentType;
+            return this;
+        }
+
+        public Builder contentLength(int contentLength) {
+            this.contentLength = contentLength;
+            return this;
+        }
+
+        public Header build() {
+            return new Header(protocolVersion, statusCode, statusText, contentType, contentLength);
+        }
     }
 
     @Override
