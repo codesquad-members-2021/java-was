@@ -4,6 +4,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,6 +32,29 @@ class ResponseHeaderTest {
                                 .contentType("text/html;charset=utf-8")
                                 .contentLength("Hello World".getBytes().length)
                                 .build()
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void toByte(String headerText, byte[] expectedHeaderByte) {
+        assertThat(ResponseHeader.from(headerText).toByte())
+                .isEqualTo(expectedHeaderByte);
+    }
+
+    @SuppressWarnings("unused")
+    static Stream<Arguments> toByte() {
+        return Stream.of(
+                Arguments.of(
+                        "HTTP/1.1 200 OK " + System.lineSeparator() +
+                                "Content-Type: text/html;charset=utf-8" + System.lineSeparator() +
+                                "Content-Length: " + "Hello World".getBytes().length + System.lineSeparator() +
+                                System.lineSeparator(),
+                        ("HTTP/1.1 200 OK " + System.lineSeparator() +
+                                "Content-Type: text/html;charset=utf-8" + System.lineSeparator() +
+                                "Content-Length: " + "Hello World".getBytes().length + System.lineSeparator() +
+                                System.lineSeparator()).getBytes(StandardCharsets.UTF_8)
                 )
         );
     }

@@ -2,6 +2,7 @@ package webserver;
 
 import util.HttpRequestUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,7 +21,7 @@ public class ResponseHeader extends Header {
         this.contentLength = contentLength;
     }
 
-    public static Header from(String headerText) {
+    public static ResponseHeader from(String headerText) {
         String[] splittedHeaderTexts = headerText.split(System.lineSeparator());
 
         Builder builder = new Builder();
@@ -87,6 +88,28 @@ public class ResponseHeader extends Header {
         public ResponseHeader build() {
             return new ResponseHeader(protocolVersion, statusCode, statusText, contentType, contentLength);
         }
+    }
+
+    private String statusLine() {
+        return super.getProtocolVersion() + " " + statusCode + " " + statusText + " ";
+    }
+
+    private String contentType() {
+        return "Content-Type: " + contentType;
+    }
+
+    private String contentLength() {
+        return "Content-Length: " + contentLength;
+    }
+
+    public byte[] toByte() {
+        return new StringBuilder()
+                .append(statusLine()).append(System.lineSeparator())
+                .append(contentType()).append(System.lineSeparator())
+                .append(contentLength()).append(System.lineSeparator())
+                .append(System.lineSeparator())
+                .toString()
+                .getBytes(StandardCharsets.UTF_8);
     }
 
     @Override

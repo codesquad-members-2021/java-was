@@ -9,6 +9,10 @@ public class Header {
         this.protocolVersion = protocolVersion;
     }
 
+    public String getProtocolVersion() {
+        return protocolVersion;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
