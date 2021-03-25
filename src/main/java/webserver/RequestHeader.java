@@ -2,6 +2,7 @@ package webserver;
 
 import util.HttpRequestUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -87,6 +88,28 @@ public class RequestHeader extends Header {
         public RequestHeader build() {
             return new RequestHeader(protocolVersion, cookie, method, path, host);
         }
+    }
+
+    private String startLine() {
+        return method + " " + path + " " + super.getProtocolVersion();
+    }
+
+    private String host() {
+        return "Host: " + host;
+    }
+
+    private String cookie() {
+        return "Cookie: " + cookie;
+    }
+
+    public byte[] toByte() {
+        return new StringBuilder()
+                .append(startLine()).append(System.lineSeparator())
+                .append(host()).append(System.lineSeparator())
+                .append(cookie()).append(System.lineSeparator())
+                .append(System.lineSeparator())
+                .toString()
+                .getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
