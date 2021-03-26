@@ -12,13 +12,13 @@ class PostMessageTest {
 
     @ParameterizedTest
     @MethodSource
-    void getRequestHeader(String messageText, RequestHeader expectedRequestHeader) {
+    void getHeader(String messageText, RequestHeader expectedRequestHeader) {
         PostMessage postMessage = PostMessage.from(messageText);
 
         assertThat(postMessage.getHeader()).isEqualTo(expectedRequestHeader);
     }
 
-    static Stream<Arguments> getRequestHeader() {
+    static Stream<Arguments> getHeader() {
         return Stream.of(
                 Arguments.of("POST /user/create HTTP/1.1" + System.lineSeparator() +
                                 "Host: localhost:8080" + System.lineSeparator() +
