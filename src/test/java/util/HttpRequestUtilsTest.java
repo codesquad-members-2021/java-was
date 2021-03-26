@@ -5,6 +5,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import util.HttpRequestUtils.Pair;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -64,6 +66,7 @@ class HttpRequestUtilsTest {
                 Arguments.of("userId=javajigi&password", "javajigi", null)
         );
     }
+
     @ParameterizedTest
     @MethodSource
     void parseCookies(String cookies, String expectedLogined, String expectedJSessionId, String expectedSession) {
@@ -127,6 +130,21 @@ class HttpRequestUtilsTest {
                 Arguments.of(
                         HttpRequestUtils.parseHeader("Content-Length: 59"),
                         new Pair("Content-Length", "59")
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void parseStatusLine(String statusLine, List<String> expectedParsedStatusLine) {
+        assertThat(HttpRequestUtils.parseStatusLine(statusLine)).isEqualTo(expectedParsedStatusLine);
+    }
+
+    static Stream<Arguments> parseStatusLine() {
+        return Stream.of(
+                Arguments.of(
+                        "GET /user/create HTTP/1.1",
+                        Arrays.asList("GET", "/user/create", "HTTP/1.1")
                 )
         );
     }
