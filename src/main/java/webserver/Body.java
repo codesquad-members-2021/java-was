@@ -13,7 +13,7 @@ public class Body {
         this.data = data;
     }
 
-    public static Body create(String bodyText) {
+    public static Body from(String bodyText) {
         return new Body(bodyText.getBytes(DEFAULT_ENCODING));
     }
 

@@ -9,9 +9,9 @@ class BodyTest {
     @Test
     void init() {
         String data = "Hello World";
-        Body expectedBody = Body.create(data);
+        Body expectedBody = Body.from(data);
 
-        Body body = Body.create(data);
+        Body body = Body.from(data);
 
         assertThat(body).isEqualTo(expectedBody);
     }
