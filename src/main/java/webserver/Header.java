@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class Header {
     protected static final String PROTOCOL_VERSION_KEY = "protocolVersion";
@@ -81,4 +82,17 @@ public abstract class Header {
     }
 
     protected abstract String statusLine();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Header header = (Header) o;
+        return Objects.equals(statusLineAttributes, header.statusLineAttributes) && Objects.equals(attributes, header.attributes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(statusLineAttributes, attributes);
+    }
 }
