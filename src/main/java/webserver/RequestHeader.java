@@ -6,7 +6,7 @@ public class RequestHeader extends Header {
     private static final String METHOD_KEY = "method";
     private static final String PATH_KEY = "path";
 
-    public RequestHeader(Map<String, String> attributes) {
+    protected RequestHeader(Map<String, String> attributes) {
         super(attributes);
     }
 

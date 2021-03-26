@@ -6,7 +6,7 @@ public class ResponseHeader extends Header {
     private static final String STATUS_CODE_KEY = "statusCode";
     private static final String STATUS_TEXT_KEY = "statusText";
 
-    public ResponseHeader(Map<String, String> attributes) {
+    protected ResponseHeader(Map<String, String> attributes) {
         super(attributes);
     }
 
