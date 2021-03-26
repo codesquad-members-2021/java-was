@@ -61,4 +61,26 @@ class PostMessageTest {
                 )
         );
     }
+
+    @ParameterizedTest
+    @MethodSource
+    void getMethod(String messageText, String expectedRequestMethod) {
+        PostMessage postMessage = PostMessage.from(messageText);
+        assertThat(postMessage.getMethod()).isEqualTo(expectedRequestMethod);
+    }
+
+    static Stream<Arguments> getMethod() {
+        return Stream.of(
+                Arguments.of("POST /user/create HTTP/1.1" + System.lineSeparator() +
+                                "Host: localhost:8080" + System.lineSeparator() +
+                                "Connection: keep-alive" + System.lineSeparator() +
+                                "Content-Length: 59" + System.lineSeparator() +
+                                "Content-Type: application/x-www-form-urlencoded" + System.lineSeparator() +
+                                "Accept: */*" + System.lineSeparator() +
+                                "" + System.lineSeparator() +
+                                "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net",
+                        "POST"
+                )
+        );
+    }
 }

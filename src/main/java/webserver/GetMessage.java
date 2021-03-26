@@ -14,4 +14,8 @@ public class GetMessage {
     public Header getHeader() {
         return header;
     }
+
+    public String getMethod() {
+        return ((RequestHeader) header).getMethod();
+    }
 }

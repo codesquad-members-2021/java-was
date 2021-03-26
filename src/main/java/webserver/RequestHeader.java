@@ -10,6 +10,10 @@ public class RequestHeader extends Header {
         super(attributes);
     }
 
+    public String getMethod() {
+        return getStatusLineAttributes().get(METHOD_KEY);
+    }
+
     @Override
     protected void putStatusLine(String[] statusLine) {
         statusLineAttributes.put(METHOD_KEY, statusLine[0]);

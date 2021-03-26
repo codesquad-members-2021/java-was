@@ -19,6 +19,7 @@ class GetMessageTest {
 
     static Stream<Arguments> getHeader() {
         return Stream.of(
+                //TODO getMessage인데 POST가  성공하는 테스트케이스로 들어가 있음!
                 Arguments.of("POST /user/create HTTP/1.1" + System.lineSeparator() +
                                 "Host: localhost:8080" + System.lineSeparator() +
                                 "Connection: keep-alive" + System.lineSeparator() +
@@ -33,6 +34,27 @@ class GetMessageTest {
                                 "Content-Type: application/x-www-form-urlencoded" + System.lineSeparator() +
                                 "Accept: */*" + System.lineSeparator() +
                                 "" + System.lineSeparator(), "request")
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void getMethod(String messageText, String expectedRequestMethod) {
+        GetMessage getMessage = GetMessage.from(messageText);
+        assertThat(getMessage.getMethod()).isEqualTo(expectedRequestMethod);
+    }
+
+    static Stream<Arguments> getMethod() {
+        return Stream.of(
+                Arguments.of("GET /user/create HTTP/1.1" + System.lineSeparator() +
+                                "Host: localhost:8080" + System.lineSeparator() +
+                                "Connection: keep-alive" + System.lineSeparator() +
+                                "Content-Length: 59" + System.lineSeparator() +
+                                "Content-Type: application/x-www-form-urlencoded" + System.lineSeparator() +
+                                "Accept: */*" + System.lineSeparator() +
+                                "" + System.lineSeparator(),
+                        "GET"
                 )
         );
     }
