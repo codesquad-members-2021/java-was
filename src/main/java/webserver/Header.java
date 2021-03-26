@@ -3,10 +3,7 @@ package webserver;
 import util.HttpRequestUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public abstract class Header {
     protected static final String PROTOCOL_VERSION_KEY = "protocolVersion";
@@ -19,27 +16,33 @@ public abstract class Header {
         this.statusLineAttributes = new HashMap<>();
     }
 
-    public static Header of(String headerText, String type) {
-        Map<String, String> attributes = attributeFrom(headerText);
-
-        String[] splittedHeaderTexts = headerText.split(System.lineSeparator());
-        String[] statusLine = splittedHeaderTexts[0].split(" ");
-
-        Header header = of(attributes, type);
-        header.putStatusLine(statusLine);
-
-        return header;
+    public Header(Map<String, String> statusLineAttributes, Map<String, String> attributes) {
+        this.statusLineAttributes = statusLineAttributes;
+        this.attributes = attributes;
     }
 
-    private static Header of(Map<String, String> attributes, String type) {
-        switch (type) {
-            case "request":
-                return new RequestHeader(attributes);
-            case "response":
-                return new ResponseHeader(attributes);
-            default:
-                throw new IllegalStateException("Unexpected value: " + type);
-        }
+    public static RequestHeader requestHeaderFrom(String headerText) {
+        String[] splittedHeaderTexts = headerText.split(System.lineSeparator());
+        List<String> statusLine = HttpRequestUtils.parseStatusLine(splittedHeaderTexts[0]);
+
+        Map<String, String> statusLineAttributes = new HashMap<>();
+        statusLineAttributes.put(RequestHeader.METHOD_KEY, statusLine.get(0));
+        statusLineAttributes.put(RequestHeader.PATH_KEY, statusLine.get(1));
+        statusLineAttributes.put(PROTOCOL_VERSION_KEY, statusLine.get(2));
+
+        return new RequestHeader(statusLineAttributes, attributeFrom(headerText));
+    }
+
+    public static ResponseHeader responseHeaderFrom(String headerText) {
+        String[] splittedHeaderTexts = headerText.split(System.lineSeparator());
+        List<String> statusLine = HttpRequestUtils.parseStatusLine(splittedHeaderTexts[0]);
+
+        Map<String, String> statusLineAttributes = new HashMap<>();
+        statusLineAttributes.put(PROTOCOL_VERSION_KEY, statusLine.get(0));
+        statusLineAttributes.put(ResponseHeader.STATUS_CODE_KEY, statusLine.get(1));
+        statusLineAttributes.put(ResponseHeader.STATUS_TEXT_KEY, statusLine.get(2));
+
+        return new ResponseHeader(statusLineAttributes, attributeFrom(headerText));
     }
 
     private static Map<String, String> attributeFrom(String headerText) {
@@ -56,8 +59,6 @@ public abstract class Header {
 
         return attributes;
     }
-
-    protected abstract void putStatusLine(String[] statusLine);
 
     public Map<String, String> getAttributes() {
         return attributes;

@@ -1,20 +1,25 @@
 package webserver;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ResponseHeader extends Header {
-    private static final String STATUS_CODE_KEY = "statusCode";
-    private static final String STATUS_TEXT_KEY = "statusText";
+    protected static final String STATUS_CODE_KEY = "statusCode";
+    protected static final String STATUS_TEXT_KEY = "statusText";
 
-    protected ResponseHeader(Map<String, String> attributes) {
-        super(attributes);
+    protected ResponseHeader(Map<String, String> statusLineAttributes, Map<String, String> attributes) {
+        super(statusLineAttributes, attributes);
     }
 
-    @Override
-    protected void putStatusLine(String[] statusLine) {
-        statusLineAttributes.put(PROTOCOL_VERSION_KEY, statusLine[0]);
-        statusLineAttributes.put(STATUS_CODE_KEY, statusLine[1]);
-        statusLineAttributes.put(STATUS_TEXT_KEY, statusLine[2]);
+    public static ResponseHeader of(List<String> statusLine, Map<String, String> attributes) {
+        Map<String, String> statusLineAttributes = new HashMap<>();
+
+        statusLineAttributes.put(PROTOCOL_VERSION_KEY, statusLine.get(0));
+        statusLineAttributes.put(STATUS_CODE_KEY, statusLine.get(1));
+        statusLineAttributes.put(STATUS_TEXT_KEY, statusLine.get(2));
+
+        return new ResponseHeader(statusLineAttributes, attributes);
     }
 
     @Override

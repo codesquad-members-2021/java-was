@@ -17,7 +17,7 @@ class ResponseHeaderTest {
     @ParameterizedTest
     @MethodSource
     void getAttributes(String headerText, Map<String, String> expectedAttributes) {
-        assertThat(ResponseHeader.of(headerText, "response").getAttributes())
+        assertThat(Header.responseHeaderFrom(headerText).getAttributes())
                 .isEqualTo(expectedAttributes);
     }
 
@@ -40,7 +40,7 @@ class ResponseHeaderTest {
     @ParameterizedTest
     @MethodSource
     void getStatusLineAttributes(String headerText, Map<String, String> expectedAttributes) {
-        assertThat(Header.of(headerText, "response").getStatusLineAttributes())
+        assertThat(Header.responseHeaderFrom(headerText).getStatusLineAttributes())
                 .isEqualTo(expectedAttributes);
     }
 
@@ -64,7 +64,7 @@ class ResponseHeaderTest {
     @ParameterizedTest
     @MethodSource
     void toByte(String headerText, byte[] expectedHeaderByte) {
-        byte[] headerByte = Header.of(headerText, "response").toByte();
+        byte[] headerByte = Header.responseHeaderFrom(headerText).toByte();
 
         assertAll(
                 () -> assertThat(headerByte).isEqualTo(expectedHeaderByte),
