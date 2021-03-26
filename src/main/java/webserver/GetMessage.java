@@ -1,21 +1,21 @@
 package webserver;
 
 public class GetMessage {
-    private Header header;
+    private RequestHeader header;
 
-    private GetMessage(Header header) {
+    private GetMessage(RequestHeader header) {
         this.header = header;
     }
 
     public static GetMessage from(String getMessage) {
-        return new GetMessage(Header.of(getMessage, "request"));
+        return new GetMessage(Header.requestHeaderFrom(getMessage));
     }
 
-    public Header getHeader() {
+    public RequestHeader getHeader() {
         return header;
     }
 
     public String getMethod() {
-        return ((RequestHeader) header).getMethod();
+        return header.getMethod();
     }
 }

@@ -25,9 +25,9 @@ class ResponseMessageTest {
                                 "Content-Length: " + "Hello World".getBytes().length + System.lineSeparator() +
                                 System.lineSeparator() +
                                 "Hello World",
-                        Header.of("HTTP/1.1 200 OK" + System.lineSeparator() +
+                        Header.responseHeaderFrom("HTTP/1.1 200 OK" + System.lineSeparator() +
                                 "Content-Type: text/html;charset=utf-8" + System.lineSeparator() +
-                                "Content-Length: " + "Hello World".getBytes().length + System.lineSeparator(), "response")
+                                "Content-Length: " + "Hello World".getBytes().length + System.lineSeparator())
                 )
         );
     }

@@ -1,10 +1,10 @@
 package webserver;
 
 public class ResponseMessage {
-    private Header header;
+    private ResponseHeader header;
     private Body body;
 
-    public ResponseMessage(Header header, Body body) {
+    public ResponseMessage(ResponseHeader header, Body body) {
         this.header = header;
         this.body = body;
     }
@@ -12,10 +12,10 @@ public class ResponseMessage {
     public static ResponseMessage from(String responseMessage) {
         String[] splittedResponseMessage = responseMessage.split(System.lineSeparator() + System.lineSeparator());
 
-        return new ResponseMessage(Header.of(splittedResponseMessage[0], "response"), Body.from(splittedResponseMessage[1]));
+        return new ResponseMessage(Header.responseHeaderFrom(splittedResponseMessage[0]), Body.from(splittedResponseMessage[1]));
     }
 
-    public Header getHeader() {
+    public ResponseHeader getHeader() {
         return header;
     }
 
