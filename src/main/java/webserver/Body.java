@@ -29,4 +29,11 @@ public class Body {
     public int hashCode() {
         return Arrays.hashCode(data);
     }
+
+    @Override
+    public String toString() {
+        return "Body{" +
+                "data=" + new String(data) +
+                '}';
+    }
 }
