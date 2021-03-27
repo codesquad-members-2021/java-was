@@ -1,5 +1,6 @@
 package util;
 
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,10 +31,16 @@ public class HttpRequestUtils {
         if (Strings.isNullOrEmpty(values)) {
             return Maps.newHashMap();
         }
-
         String[] tokens = values.split(separator);
         return Arrays.stream(tokens).map(t -> getKeyValue(t, "=")).filter(p -> p != null)
-                .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+                .collect(Collectors.toMap(p -> p.getKey(), p -> {
+                    try {
+                        return URLDecoder.decode(p.getValue(), "UTF-8");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }));
     }
 
     static Pair getKeyValue(String keyValue, String regex) {
