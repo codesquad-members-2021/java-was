@@ -1,4 +1,4 @@
-package webserver;
+package http;
 
 import util.HttpRequestUtils;
 import util.IOUtils;
@@ -22,15 +22,32 @@ public class HttpRequest {
     private String body;
 
     private HttpRequest() {
-
     }
-
 
     public String getUrl() {
         return url;
     }
 
-    public void addStartLine(String buffer) {
+    public static HttpRequest of(InputStream in) throws IOException {
+        HttpRequest httpRequest = new HttpRequest();
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        String buffer;
+
+        buffer = br.readLine();
+        httpRequest.addStartLine(buffer);
+        while (!(buffer = br.readLine()).equals("")) {
+            httpRequest.addHeaders(buffer);
+        }
+
+        String contentLength = httpRequest.header("Content-Length");
+        if (contentLength != null) {
+            httpRequest.addBody(IOUtils.readData(br, Integer.parseInt(contentLength)));
+        }
+
+        return httpRequest;
+    }
+
+    private void addStartLine(String buffer) {
         String[] startLine = buffer.split(" ");
         method = HttpMethod.valueOf(startLine[0].toUpperCase());
         url = startLine[1];
@@ -44,38 +61,13 @@ public class HttpRequest {
         }
     }
 
-    public void addHeaders(String buffer) {
+    private void addHeaders(String buffer) {
         HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(buffer);
         headers.put(pair.getKey(), pair.getValue());
         String cookies;
         if ((cookies = headers.get("Cookie")) != null) {
             this.cookies = HttpRequestUtils.parseCookies(cookies);
         }
-    }
-
-    public static HttpRequest of(InputStream in) {
-        HttpRequest httpRequest = new HttpRequest();
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        String buffer;
-        try {
-            buffer = br.readLine();
-            httpRequest.addStartLine(buffer);
-            while (!(buffer = br.readLine()).equals("")) {
-                httpRequest.addHeaders(buffer);
-            }
-
-            String contentLength = httpRequest.header("Content-Length");
-            if (contentLength != null) {
-                httpRequest.addBody(IOUtils.readData(br, Integer.parseInt(contentLength)));
-            }
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-        return httpRequest;
     }
 
     private void addBody(String readData) {
@@ -96,7 +88,7 @@ public class HttpRequest {
         return cookies.get(key);
     }
 
-    public HttpMethod getMethod() {
+    public HttpMethod method() {
         return method;
     }
 
@@ -104,7 +96,4 @@ public class HttpRequest {
         return data.get(key);
     }
 
-//    public boolean loginCookie(){
-//
-//    }
 }
