@@ -1,4 +1,4 @@
-package webserver;
+package http;
 
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.AfterEach;
@@ -24,7 +24,7 @@ class HttpRequestTest {
 
     @Test
     @DisplayName("리퀘스트 객체를 생성")
-    public void createRequest() {
+    public void createRequest() throws IOException {
         String request = "GET /index.html HTTP/1.1\r\n" +
                 "Host: localhost:8080\r\n" +
                 "Connection: keep-alive\r\n" +
@@ -36,7 +36,7 @@ class HttpRequestTest {
 
     @Test
     @DisplayName("리퀘스트 쿼리 분석")
-    public void requestQuery() {
+    public void requestQuery() throws IOException {
         String request = "GET /user/create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1\r\n" +
                 "Host: localhost:8080\r\n" +
                 "Connection: keep-alive\r\n" +
