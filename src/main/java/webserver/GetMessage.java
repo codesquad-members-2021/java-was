@@ -27,13 +27,14 @@ public class GetMessage implements RequestMessage {
         return header.getMethod();
     }
 
+    @Override
     public Map<String, String> getParameters() {
         Map<String, String> statusLine = header.getStatusLineAttributes();
 
         try {
             URI uri = new URI(statusLine.get(RequestHeader.PATH_KEY));
             return HttpRequestUtils.parseQueryString(uri.getQuery());
-            
+
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Request의 Path가 올바르지 않음. path : " + statusLine.get(RequestHeader.PATH_KEY), e);
         }
