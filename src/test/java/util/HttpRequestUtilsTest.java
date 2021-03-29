@@ -7,7 +7,10 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import org.junit.jupiter.api.Test;
 import util.HttpRequestUtils.Pair;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class HttpRequestUtilsTest {
     @Test
@@ -26,21 +29,21 @@ public class HttpRequestUtilsTest {
     @Test
     public void parseQueryString_null() {
         Map<String, String> parameters = HttpRequestUtils.parseQueryString(null);
-        assertThat(parameters.isEmpty(), is(true));
+        assertThat(parameters.isEmpty()).isTrue();
 
         parameters = HttpRequestUtils.parseQueryString("");
-        assertThat(parameters.isEmpty(), is(true));
+        assertThat(parameters.isEmpty()).isTrue();
 
         parameters = HttpRequestUtils.parseQueryString(" ");
-        assertThat(parameters.isEmpty(), is(true));
+        assertThat(parameters.isEmpty()).isTrue();
     }
 
     @Test
     public void parseQueryString_invalid() {
         String queryString = "userId=javajigi&password";
         Map<String, String> parameters = HttpRequestUtils.parseQueryString(queryString);
-        assertThat(parameters.get("userId"), is("javajigi"));
-        assertThat(parameters.get("password"), is(nullValue()));
+        assertThat(parameters.get("userId")).isEqualTo("javajigi");
+        assertThat(parameters.get("password")).isNull();
     }
 
     @Test
