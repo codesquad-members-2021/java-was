@@ -1,6 +1,6 @@
 package webserver;
 
-public class GetMessage {
+public class GetMessage implements RequestMessage {
     private RequestHeader header;
 
     private GetMessage(RequestHeader header) {
@@ -11,10 +11,12 @@ public class GetMessage {
         return new GetMessage(Header.requestHeaderFrom(getMessage));
     }
 
+    @Override
     public RequestHeader getHeader() {
         return header;
     }
 
+    @Override
     public String getMethod() {
         return header.getMethod();
     }

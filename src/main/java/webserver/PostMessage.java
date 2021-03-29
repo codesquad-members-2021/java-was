@@ -1,6 +1,6 @@
 package webserver;
 
-public class PostMessage {
+public class PostMessage implements RequestMessage {
     private RequestHeader header;
     private Body body;
 
@@ -15,6 +15,7 @@ public class PostMessage {
         return new PostMessage(Header.requestHeaderFrom(splittedPostMessage[0]), Body.from(splittedPostMessage[1]));
     }
 
+    @Override
     public RequestHeader getHeader() {
         return header;
     }
@@ -23,6 +24,7 @@ public class PostMessage {
         return body;
     }
 
+    @Override
     public String getMethod() {
         return header.getMethod();
     }
