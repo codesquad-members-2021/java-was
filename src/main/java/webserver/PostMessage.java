@@ -1,5 +1,12 @@
 package webserver;
 
+import util.HttpRequestUtils;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
 public class PostMessage implements RequestMessage {
     private RequestHeader header;
     private Body body;
@@ -27,5 +34,15 @@ public class PostMessage implements RequestMessage {
     @Override
     public String getMethod() {
         return header.getMethod();
+    }
+
+
+    public Map<String, String> getParameters() {
+        try {
+            String decode = URLDecoder.decode(body.asString(), StandardCharsets.UTF_8.name());
+            return HttpRequestUtils.parseQueryString(decode);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("인코딩 오류", e);
+        }
     }
 }

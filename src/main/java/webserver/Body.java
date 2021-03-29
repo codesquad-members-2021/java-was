@@ -17,6 +17,10 @@ public class Body {
         return new Body(bodyText.getBytes(DEFAULT_ENCODING));
     }
 
+    public String asString() {
+        return new String(data, DEFAULT_ENCODING);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
