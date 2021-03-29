@@ -9,7 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
+
     private DataOutputStream dos;
+
+    private String startLine;
     private Map<String, String> headers = new HashMap<>();
 
     public HttpResponse(OutputStream os) {
@@ -17,42 +20,41 @@ public class HttpResponse {
     }
 
     public void forward(String url) throws IOException {
+        startLine = "HTTP/1.1 200 OK \r\n";
         byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
 
         if (url.endsWith(".css")) {
-            response200Header(dos, body.length, "css");
+            addHeader("Content-Type", "text/css;charset=utf-8");
         } else {
-            response200Header(dos, body.length, "html");
+            addHeader("Content-Type", "text/html;charset=utf-8");
         }
+        addHeader("Content-Length", String.valueOf(body.length));
 
-        responseBody(dos, body);
+        processHeaders();
+        responseBody(body);
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) throws IOException {
-        dos.writeBytes("HTTP/1.1 200 OK \r\n");
-        dos.writeBytes("Content-Type: text/" + contentType + ";charset=utf-8\r\n");
-        dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-        dos.writeBytes("\r\n");
-
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) throws IOException {
+    private void responseBody(byte[] body) throws IOException {
         dos.write(body, 0, body.length);
         dos.flush();
-
     }
 
     public void redirect(String url) throws IOException {
-        dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-        dos.writeBytes("Location: " + url + "\r\n");
-        for (Map.Entry<String, String> header : headers.entrySet()) {
-            dos.writeBytes(header.getKey() + ": " + header.getValue() + "\r\n");
-        }
-
-        dos.writeBytes("\r\n");
+        startLine = "HTTP/1.1 302 FOUND \r\n";
+        addHeader("Location", url);
+        processHeaders();
     }
 
     public void addHeader(String header, String value) {
         headers.put(header, value);
     }
+
+    private void processHeaders() throws IOException {
+        dos.writeBytes(startLine);
+        for (Map.Entry<String, String> header : headers.entrySet()) {
+            dos.writeBytes(header.getKey() + ": " + header.getValue() + "\r\n");
+        }
+        dos.writeBytes("\r\n");
+    }
+
 }
