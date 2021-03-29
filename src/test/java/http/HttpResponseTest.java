@@ -6,7 +6,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import org.assertj.core.api.SoftAssertions;
 
@@ -14,11 +16,13 @@ class HttpResponseTest {
 
     private SoftAssertions softly;
     private ByteArrayOutputStream os;
+    private HttpResponse response;
 
     @BeforeEach
     public void beforeEach() {
         softly = new SoftAssertions();
         os = new ByteArrayOutputStream();
+        response = new HttpResponse(os);
     }
 
     @AfterEach
@@ -27,15 +31,29 @@ class HttpResponseTest {
     }
 
     @Test
+    @DisplayName("index.html 읽기")
     public void sendOk() throws IOException {
-        HttpResponse response = new HttpResponse(os);
         response.forward("/index.html");
 
-        softly.assertThat(os.toString()).contains("HTTP/1.1 200 OK \r\n");
-        softly.assertThat(os.toString()).contains("Content-Type: text/html;charset=utf-8\r\n");
-        softly.assertThat(os.toString()).contains("Content-Length: 7049\r\n");
+        assertResponseHeader("/index.html", "html");
         softly.assertThat(os.toString()).contains("<title>SLiPP Java Web Programming</title>");
     }
 
+    @Test
+    @DisplayName("css 파일 읽기")
+    public void sendOkCss() throws IOException {
+        response.forward("/css/styles.css");
+
+        assertResponseHeader("/css/styles.css", "css");
+        softly.assertThat(os.toString()).contains(".navbar-default .dropdown-menu li > a {padding-left:30px;}");
+    }
+
+    private void assertResponseHeader(String url, String type) throws IOException {
+        byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+
+        softly.assertThat(os.toString()).contains("HTTP/1.1 200 OK \r\n");
+        softly.assertThat(os.toString()).contains("Content-Type: text/" + type + ";charset=utf-8\r\n");
+        softly.assertThat(os.toString()).contains("Content-Length: " + body.length + "\r\n");
+    }
 
 }
