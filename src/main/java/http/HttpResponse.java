@@ -38,4 +38,8 @@ public class HttpResponse {
         dos.flush();
 
     }
+
+    public void redirect(String url) {
+
+    }
 }

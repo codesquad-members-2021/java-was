@@ -48,12 +48,26 @@ class HttpResponseTest {
         softly.assertThat(os.toString()).contains(".navbar-default .dropdown-menu li > a {padding-left:30px;}");
     }
 
+    @Test
+    @DisplayName("redirect to /index.html")
+    public void sendRedirect() {
+        String url = "/index.html";
+        response.redirect(url);
+
+        softly.assertThat(os.toString())
+                .contains("HTTP/1.1 302 FOUND \r\n")
+                .contains("Location: " + url + "\r\n")
+                .contains("\r\n");
+    }
+
+
     private void assertResponseHeader(String url, String type) throws IOException {
         byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
 
-        softly.assertThat(os.toString()).contains("HTTP/1.1 200 OK \r\n");
-        softly.assertThat(os.toString()).contains("Content-Type: text/" + type + ";charset=utf-8\r\n");
-        softly.assertThat(os.toString()).contains("Content-Length: " + body.length + "\r\n");
+        softly.assertThat(os.toString())
+                .contains("HTTP/1.1 200 OK \r\n")
+                .contains("Content-Type: text/" + type + ";charset=utf-8\r\n")
+                .contains("Content-Length: " + body.length + "\r\n");
     }
 
 }
