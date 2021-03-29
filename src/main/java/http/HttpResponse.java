@@ -5,9 +5,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HttpResponse {
     private DataOutputStream dos;
+    private Map<String, String> headers = new HashMap<>();
 
     public HttpResponse(OutputStream os) {
         dos = new DataOutputStream(os);
@@ -42,10 +45,14 @@ public class HttpResponse {
     public void redirect(String url) throws IOException {
         dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
         dos.writeBytes("Location: " + url + "\r\n");
+        for (Map.Entry<String, String> header : headers.entrySet()) {
+            dos.writeBytes(header.getKey() + ": " + header.getValue() + "\r\n");
+        }
+
         dos.writeBytes("\r\n");
     }
 
     public void addHeader(String header, String value) {
-
+        headers.put(header, value);
     }
 }
