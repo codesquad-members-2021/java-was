@@ -25,9 +25,11 @@ public class HttpResponse {
     public void forward(String url) throws IOException {
         byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
         if (url.endsWith(".css")) {
-            response200HeaderWithCss(body.length);
+            response200Header(body.length, "text/css");
+        } else if (url.endsWith(".js")) {
+            response200Header(body.length, "application/javascript");
         } else {
-            response200Header(body.length);
+            response200Header(body.length, "text/html");
         }
         responseBody(body);
     }
@@ -36,21 +38,10 @@ public class HttpResponse {
 
     }
 
-    public void response200HeaderWithCss(int lengthOfBodyContent) {
+    public void response200Header(int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    public void response200Header(int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type:" + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
@@ -73,7 +64,7 @@ public class HttpResponse {
             processHeaders();
             dos.writeBytes("Location: " + url + "\r\n");
         } catch (IOException e) {
-
+            e.printStackTrace();
         }
     }
 
