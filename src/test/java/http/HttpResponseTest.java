@@ -50,7 +50,7 @@ class HttpResponseTest {
 
     @Test
     @DisplayName("redirect to /index.html")
-    public void sendRedirect() {
+    public void sendRedirect() throws IOException {
         String url = "/index.html";
         response.redirect(url);
 

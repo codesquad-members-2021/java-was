@@ -39,7 +39,9 @@ public class HttpResponse {
 
     }
 
-    public void redirect(String url) {
-
+    public void redirect(String url) throws IOException {
+        dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
+        dos.writeBytes("Location: " + url + "\r\n");
+        dos.writeBytes("\r\n");
     }
 }
