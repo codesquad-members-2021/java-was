@@ -44,4 +44,8 @@ public class HttpResponse {
         dos.writeBytes("Location: " + url + "\r\n");
         dos.writeBytes("\r\n");
     }
+
+    public void addHeader(String header, String value) {
+
+    }
 }

@@ -54,12 +54,27 @@ class HttpResponseTest {
         String url = "/index.html";
         response.redirect(url);
 
+        assertRedirectResponseHeader(url);
+    }
+
+    @Test
+    @DisplayName("redirect cookie test")
+    public void sendRedirectWithCookie() throws IOException {
+        String url = "/index.html";
+        response.addHeader("Set-Cookie", "logined=true");
+        response.redirect(url);
+
+        assertRedirectResponseHeader(url);
+        softly.assertThat(os.toString())
+                .contains("Set-Cookie: logined=true");
+    }
+
+    private void assertRedirectResponseHeader(String url) {
         softly.assertThat(os.toString())
                 .contains("HTTP/1.1 302 FOUND \r\n")
                 .contains("Location: " + url + "\r\n")
-                .contains("\r\n");
+                .contains("\r\n\r\n");
     }
-
 
     private void assertResponseHeader(String url, String type) throws IOException {
         byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
