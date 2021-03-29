@@ -26,6 +26,8 @@ public class HttpResponse {
         byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
         if (url.endsWith(".css")) {
             response200HeaderWithCss(body.length);
+        } else if (url.endsWith(".js")) {
+            response200HeaderWithJs(body.length);
         } else {
             response200Header(body.length);
         }
@@ -40,6 +42,17 @@ public class HttpResponse {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    public void response200HeaderWithJs(int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: application/javascript\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
