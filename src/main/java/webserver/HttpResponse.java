@@ -86,7 +86,7 @@ public class HttpResponse {
             processHeaders();
             dos.writeBytes("Location: " + url + "\r\n");
         } catch (IOException e) {
-
+            e.printStackTrace();
         }
     }
 

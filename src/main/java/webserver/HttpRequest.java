@@ -28,8 +28,8 @@ public class HttpRequest {
                 return;
             }
             headers = new HashMap<>();
-            while (!"".equals(line)) {
-                System.out.println(line);
+            while (!line.isEmpty()) {
+                log.info("headers : {}", line);
                 line = br.readLine();
                 if (line == null) {
                     break;
@@ -76,7 +76,7 @@ public class HttpRequest {
         return headers;
     }
 
-    public String getParameter(String fieldName) throws IOException {
+    public String getParameter(String fieldName) {
         return parameters.get(fieldName);
     }
 }
