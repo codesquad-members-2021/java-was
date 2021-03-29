@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Objects;
 
 public class PostMessage implements RequestMessage {
     private RequestHeader header;
@@ -44,5 +45,18 @@ public class PostMessage implements RequestMessage {
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException("인코딩 오류", e);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PostMessage that = (PostMessage) o;
+        return Objects.equals(header, that.header) && Objects.equals(body, that.body);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(header, body);
     }
 }

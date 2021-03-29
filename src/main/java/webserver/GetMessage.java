@@ -5,6 +5,7 @@ import util.HttpRequestUtils;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.Objects;
 
 public class GetMessage implements RequestMessage {
     private RequestHeader header;
@@ -38,5 +39,18 @@ public class GetMessage implements RequestMessage {
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Request의 Path가 올바르지 않음. path : " + statusLine.get(RequestHeader.PATH_KEY), e);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GetMessage that = (GetMessage) o;
+        return Objects.equals(header, that.header);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(header);
     }
 }
