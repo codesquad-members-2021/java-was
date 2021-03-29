@@ -27,21 +27,7 @@ public class RequestHandler extends Thread {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-
-            String requestLine = br.readLine();
-            String line = requestLine;
-            Map<String, String> headers = new HashMap<>();
-            while (!"".equals(line)) {
-                System.out.println(line);
-                line = br.readLine();
-                String[] headerTokens = line.split(": ");
-                if (headerTokens.length == 2) {
-                    headers.put(headerTokens[0], headerTokens[1]);
-                }
-            }
-
-            HttpRequest httpRequest = new HttpRequest(requestLine, headers);
+            HttpRequest httpRequest = new HttpRequest(in);
             HttpResponse httpResponse = new HttpResponse(out);
 
             HttpMethod method = httpRequest.getMethod();
@@ -51,22 +37,16 @@ public class RequestHandler extends Thread {
             DataOutputStream dos = new DataOutputStream(out);
 
             if (url.startsWith("/create")) {
-                String RequestBody = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
-                Map<String, String> parameters = HttpRequestUtils.parseQueryString(RequestBody);
-                log.info("user : {}", parameters.toString());
-                DataBase.addUser(new User(parameters.get("userId"), parameters.get("password"), parameters.get("name"), parameters.get("email")));
+                String userId = httpRequest.getParameter("userId");
+                String password = httpRequest.getParameter("password");
+                String name = httpRequest.getParameter("name");
+                String email = httpRequest.getParameter("email");
+                DataBase.addUser(new User(userId, password, name, email));
                 httpResponse.sendRedirect("/index.html");
             } else if (url.startsWith("/login")) {
-                String contentLength = headers.get("Content-Length");
-                log.info("contentLength : {}", contentLength);
-                String RequestBody = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
-
-                Map<String, String> info = HttpRequestUtils.parseQueryString(RequestBody);
-                String userId = info.get("userId");
-                String password = info.get("password");
+                String userId = httpRequest.getParameter("userId");
+                String password = httpRequest.getParameter("password");
                 User targetUser = DataBase.findUserById(userId);
-                log.info("userId : {}", userId);
-                log.info("password : {}", password);
                 if (targetUser == null || !password.equals(targetUser.getPassword())) {
                     httpResponse.addHeader("Set-Cookie", "logined=false");
                     httpResponse.sendRedirect("/user/login_failed.html");
@@ -76,7 +56,7 @@ public class RequestHandler extends Thread {
                     httpResponse.sendRedirect("/index.html");
                 }
             } else if (url.startsWith("/list")) {
-                String cookies = headers.get("Cookie");
+                String cookies = httpRequest.getHeader("Cookie");
                 Map<String, String> cookieStringMap = HttpRequestUtils.parseCookies(cookies);
                 log.info("Cookie: {}", cookieStringMap.toString());
                 if (cookieStringMap.get("logined").equals("false")) {
