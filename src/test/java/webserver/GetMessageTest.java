@@ -12,7 +12,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class GetMessageTest {
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("getHeader")
     void getHeader(String messageText, RequestHeader expectedRequestHeader) {
         GetMessage getMessage = GetMessage.from(messageText);
 
@@ -41,7 +41,7 @@ class GetMessageTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("getMethod")
     void getMethod(String messageText, String expectedRequestMethod) {
         GetMessage getMessage = GetMessage.from(messageText);
         assertThat(getMessage.getMethod()).isEqualTo(expectedRequestMethod);
@@ -62,7 +62,7 @@ class GetMessageTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("getParameters")
     void getParameters(String messageText, Map<String, String> expectedParameters) {
         GetMessage getMessage = GetMessage.from(messageText);
         assertThat(getMessage.getParameters())
@@ -79,7 +79,7 @@ class GetMessageTest {
                                 "Content-Type: application/x-www-form-urlencoded" + System.lineSeparator() +
                                 "Accept: */*" + System.lineSeparator() +
                                 "" + System.lineSeparator(),
-                        new HashMap() {{
+                        new HashMap<String, String>() {{
                             put("userId", "javajigi");
                             put("password", "password");
                             put("name", "박재성");

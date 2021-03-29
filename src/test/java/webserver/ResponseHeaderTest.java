@@ -15,13 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ResponseHeaderTest {
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("getAttributes")
     void getAttributes(String headerText, Map<String, String> expectedAttributes) {
         assertThat(Header.responseHeaderFrom(headerText).getAttributes())
                 .isEqualTo(expectedAttributes);
     }
 
-    @SuppressWarnings("unused")
     static Stream<Arguments> getAttributes() {
         return Stream.of(
                 Arguments.of(
@@ -29,7 +28,7 @@ class ResponseHeaderTest {
                                 "Content-Type: text/html;charset=utf-8" + System.lineSeparator() +
                                 "Content-Length: " + "Hello World".getBytes().length + System.lineSeparator() +
                                 System.lineSeparator(),
-                        new LinkedHashMap() {{
+                        new LinkedHashMap<String, String>() {{
                             put("Content-Type", "text/html;charset=utf-8");
                             put("Content-Length", String.valueOf("Hello World".getBytes().length));
                         }}
@@ -38,13 +37,12 @@ class ResponseHeaderTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("getStatusLineAttributes")
     void getStatusLineAttributes(String headerText, Map<String, String> expectedAttributes) {
         assertThat(Header.responseHeaderFrom(headerText).getStatusLineAttributes())
                 .isEqualTo(expectedAttributes);
     }
 
-    @SuppressWarnings("unused")
     static Stream<Arguments> getStatusLineAttributes() {
         return Stream.of(
                 Arguments.of(
@@ -62,7 +60,7 @@ class ResponseHeaderTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("toByte")
     void toByte(String headerText, byte[] expectedHeaderByte) {
         byte[] headerByte = Header.responseHeaderFrom(headerText).toByte();
 
@@ -72,7 +70,6 @@ class ResponseHeaderTest {
         );
     }
 
-    @SuppressWarnings("unused")
     static Stream<Arguments> toByte() {
         return Stream.of(
                 Arguments.of(

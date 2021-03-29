@@ -11,7 +11,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class PostMessageTest {
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("getHeader")
     void getHeader(String messageText, RequestHeader expectedRequestHeader) {
         PostMessage postMessage = PostMessage.from(messageText);
 
@@ -40,7 +40,7 @@ class PostMessageTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("getBody")
     void getBody(String messageText, Body expectedBody) {
         PostMessage postMessage = PostMessage.from(messageText);
 
@@ -63,7 +63,7 @@ class PostMessageTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("getMethod")
     void getMethod(String messageText, String expectedRequestMethod) {
         PostMessage postMessage = PostMessage.from(messageText);
         assertThat(postMessage.getMethod()).isEqualTo(expectedRequestMethod);

@@ -11,7 +11,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class ResponseMessageTest {
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("getHeader")
     void getHeader(String messageText, Header expectedRequestHeader) {
         ResponseMessage responseMessage = ResponseMessage.from(messageText);
 
@@ -33,7 +33,7 @@ class ResponseMessageTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("getBody")
     void getBody(String messageText, Body expectedBody) {
         ResponseMessage responseMessage = ResponseMessage.from(messageText);
 

@@ -13,16 +13,16 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+
 class RequestHeaderTest {
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("getAttributes")
     void getAttributes(String headerText, Map<String, String> expectedAttributes) {
         assertThat(Header.requestHeaderFrom(headerText).getAttributes())
                 .isEqualTo(expectedAttributes);
     }
 
-    @SuppressWarnings("unused")
     static Stream<Arguments> getAttributes() {
         return Stream.of(
                 Arguments.of("GET / HTTP/1.1" + System.lineSeparator() +
@@ -42,7 +42,7 @@ class RequestHeaderTest {
                                 "Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7" + System.lineSeparator() +
                                 "Cookie: Idea-1c77831=5ced54c8-cabd-4355-ae5a-97b17f9d7443" + System.lineSeparator() +
                                 System.lineSeparator(),
-                        new LinkedHashMap() {{
+                        new LinkedHashMap<String, String>() {{
                             put("Host", "localhost:8080");
                             put("Connection", "keep-alive");
                             put("Cache-Control", "max-age=0");
@@ -64,7 +64,7 @@ class RequestHeaderTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("getMethod")
     void getMethod(String headerText, String expectedMethod) {
         assertThat(Header.requestHeaderFrom(headerText).getMethod())
                 .isEqualTo(expectedMethod);
@@ -106,13 +106,12 @@ class RequestHeaderTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("getStatusLineAttributes")
     void getStatusLineAttributes(String headerText, Map<String, String> expectedAttributes) {
         assertThat(Header.requestHeaderFrom(headerText).getStatusLineAttributes())
                 .isEqualTo(expectedAttributes);
     }
 
-    @SuppressWarnings("unused")
     static Stream<Arguments> getStatusLineAttributes() {
         return Stream.of(
                 Arguments.of("GET / HTTP/1.1" + System.lineSeparator() +
@@ -132,7 +131,7 @@ class RequestHeaderTest {
                                 "Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7" + System.lineSeparator() +
                                 "Cookie: Idea-1c77831=5ced54c8-cabd-4355-ae5a-97b17f9d7443" + System.lineSeparator() +
                                 System.lineSeparator(),
-                        new HashMap() {{
+                        new HashMap<String, String>() {{
                             put("method", "GET");
                             put("path", "/");
                             put("protocolVersion", "HTTP/1.1");
@@ -142,7 +141,7 @@ class RequestHeaderTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("toByte")
     void toByte(String headerText, byte[] expectedHeaderByte) {
         byte[] headerByte = Header.requestHeaderFrom(headerText).toByte();
 
@@ -153,7 +152,6 @@ class RequestHeaderTest {
 
     }
 
-    @SuppressWarnings("unused")
     static Stream<Arguments> toByte() {
         return Stream.of(
                 Arguments.of(
