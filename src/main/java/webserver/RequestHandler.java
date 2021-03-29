@@ -2,6 +2,8 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 import controller.Controller;
 import controller.CreateUserController;
@@ -13,7 +15,14 @@ import org.slf4j.LoggerFactory;
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
-    private Socket connection;
+    private static final Map<String, Controller> CONTROLLER_MAP = new HashMap<>();
+    private final Socket connection;
+
+    static {
+        CONTROLLER_MAP.put("/create", new CreateUserController());
+        CONTROLLER_MAP.put("/login", new LoginController());
+        CONTROLLER_MAP.put("/list", new ListUserController());
+    }
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -31,19 +40,12 @@ public class RequestHandler extends Thread {
             log.info("Http Method: {}", method.name());
             String url = httpRequest.getPath();
             log.info("path : {}", url);
-
-            if (url.startsWith("/create")) {
-                Controller createUserController = new CreateUserController();
-                createUserController.service(httpRequest, httpResponse);
-            } else if (url.startsWith("/login")) {
-                Controller loginController = new LoginController();
-                loginController.service(httpRequest, httpResponse);
-            } else if (url.startsWith("/list")) {
-                Controller listUserController = new ListUserController();
-                listUserController.service(httpRequest, httpResponse);
-            } else {
+            if (!CONTROLLER_MAP.containsKey(url)) {
                 httpResponse.forward(url);
+                return;
             }
+            Controller controller = CONTROLLER_MAP.get(url);
+            controller.service(httpRequest, httpResponse);
         } catch (IOException e) {
             log.error(e.getMessage());
         }

@@ -50,7 +50,7 @@ public class ListUserController extends AbstractController {
             }
             result.append(bodyStr.substring(tbodyIndex + 7));
             log.info("result: {}", result.toString());
-            response.response200Header(result.toString().getBytes().length);
+            response.response200Header(result.toString().getBytes().length, "text/html");
             response.responseBody(result.toString().getBytes());
         }
     }
