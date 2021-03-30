@@ -30,9 +30,11 @@ public class WebCat extends Thread {
             HttpResponse httpResponse = new HttpResponse(out);
             MappingUrlHandler mappingUrlHandler = new MappingUrlHandler(httpRequest.getMethod(), httpRequest.getUrl());
             DataOutputStream dos = new DataOutputStream(out);
+            if(httpRequest.getUrl().contains(".")) {
+                ReturnValueHandler.responseStaticFile(dos, httpRequest.getUrl());
+            }
             try {
                 Object returnValue = mappingUrlHandler.invokeMethod(httpRequest, httpResponse);
-                //TODO 여기서 returnValue 를 resolve 하는 방식을 찾아야 한다.
                 ReturnValueHandler returnValueHandler = new ReturnValueHandler(returnValue, dos);
                 returnValueHandler.handle();
             } catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchMethodException | InstantiationException e) {

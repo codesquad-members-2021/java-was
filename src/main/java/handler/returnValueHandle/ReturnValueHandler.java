@@ -33,12 +33,27 @@ public class ReturnValueHandler {
         }
     }
 
+    public static void responseStaticFile(DataOutputStream dos, String url) throws IOException {
+        byte[] body = Files.readAllBytes(new File(PREFIX + url).toPath());
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: text/css;charset=utf-8 \r\n");
+            dos.writeBytes(String.format("Content-Length: %d \r\n", body.length));
+            dos.writeBytes("\r\n");
+            dos.write(body, 0, body.length);
+            dos.flush();
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
     private void response302HeaderWithCookies(DataOutputStream dos, String location, String cookie) {
         try {
             dos.writeBytes("HTTP/1.1 302 \r\n");
             dos.writeBytes(String.format("Location: %s \r\n", location));
             dos.writeBytes(String.format("Set-Cookie: %s \r\n", cookie));
             dos.writeBytes("\r\n");
+
         } catch (IOException e) {
             log.error(e.getMessage());
         }
