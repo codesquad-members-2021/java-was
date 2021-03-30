@@ -3,9 +3,7 @@ package webserver;
 import util.HttpRequestUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public abstract class Header {
     protected static final String PROTOCOL_VERSION_KEY = "protocolVersion";
@@ -18,27 +16,23 @@ public abstract class Header {
         this.statusLineAttributes = new HashMap<>();
     }
 
-    public static Header of(String headerText, String type) {
-        Map<String, String> attributes = attributeFrom(headerText);
-
-        String[] splittedHeaderTexts = headerText.split(System.lineSeparator());
-        String[] statusLine = splittedHeaderTexts[0].split(" ");
-
-        Header header = of(attributes, type);
-        header.putStatusLine(statusLine);
-
-        return header;
+    public Header(Map<String, String> statusLineAttributes, Map<String, String> attributes) {
+        this.statusLineAttributes = statusLineAttributes;
+        this.attributes = attributes;
     }
 
-    private static Header of(Map<String, String> attributes, String type) {
-        switch (type) {
-            case "request":
-                return new RequestHeader(attributes);
-            case "response":
-                return new ResponseHeader(attributes);
-            default:
-                throw new IllegalStateException("Unexpected value: " + type);
-        }
+    public static RequestHeader requestHeaderFrom(String headerText) {
+        String[] splittedHeaderTexts = headerText.split(System.lineSeparator());
+        List<String> statusLine = HttpRequestUtils.parseStatusLine(splittedHeaderTexts[0]);
+
+        return RequestHeader.of(statusLine, attributeFrom(headerText));
+    }
+
+    public static ResponseHeader responseHeaderFrom(String headerText) {
+        String[] splittedHeaderTexts = headerText.split(System.lineSeparator());
+        List<String> statusLine = HttpRequestUtils.parseStatusLine(splittedHeaderTexts[0]);
+
+        return ResponseHeader.of(statusLine, attributeFrom(headerText));
     }
 
     private static Map<String, String> attributeFrom(String headerText) {
@@ -55,8 +49,6 @@ public abstract class Header {
 
         return attributes;
     }
-
-    protected abstract void putStatusLine(String[] statusLine);
 
     public Map<String, String> getAttributes() {
         return attributes;
@@ -81,4 +73,17 @@ public abstract class Header {
     }
 
     protected abstract String statusLine();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Header header = (Header) o;
+        return Objects.equals(statusLineAttributes, header.statusLineAttributes) && Objects.equals(attributes, header.attributes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(statusLineAttributes, attributes);
+    }
 }

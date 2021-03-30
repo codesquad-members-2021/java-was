@@ -1,20 +1,30 @@
 package webserver;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RequestHeader extends Header {
-    private static final String METHOD_KEY = "method";
-    private static final String PATH_KEY = "path";
+    public static final String PATH_KEY = "path";
 
-    protected RequestHeader(Map<String, String> attributes) {
-        super(attributes);
+    protected static final String METHOD_KEY = "method";
+
+    protected RequestHeader(Map<String, String> statusLineAttributes, Map<String, String> attributes) {
+        super(statusLineAttributes, attributes);
     }
 
-    @Override
-    protected void putStatusLine(String[] statusLine) {
-        statusLineAttributes.put(METHOD_KEY, statusLine[0]);
-        statusLineAttributes.put(PATH_KEY, statusLine[1]);
-        statusLineAttributes.put(PROTOCOL_VERSION_KEY, statusLine[2]);
+    public static RequestHeader of(List<String> statusLine, Map<String, String> attributes) {
+        Map<String, String> statusLineAttributes = new HashMap<>();
+
+        statusLineAttributes.put(METHOD_KEY, statusLine.get(0));
+        statusLineAttributes.put(PATH_KEY, statusLine.get(1));
+        statusLineAttributes.put(PROTOCOL_VERSION_KEY, statusLine.get(2));
+
+        return new RequestHeader(statusLineAttributes, attributes);
+    }
+
+    public String getMethod() {
+        return getStatusLineAttributes().get(METHOD_KEY);
     }
 
     @Override

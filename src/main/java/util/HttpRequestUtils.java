@@ -1,11 +1,12 @@
 package util;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HttpRequestUtils {
     /**
@@ -51,6 +52,11 @@ public class HttpRequestUtils {
 
     public static Pair parseHeader(String header) {
         return getKeyValue(header, ": ");
+    }
+
+    public static List<String> parseStatusLine(String statusLine) {
+        return Arrays.stream(statusLine.split(" "))
+                .collect(Collectors.toList());
     }
 
     public static class Pair {

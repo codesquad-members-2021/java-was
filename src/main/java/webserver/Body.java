@@ -13,8 +13,12 @@ public class Body {
         this.data = data;
     }
 
-    public static Body create(String bodyText) {
+    public static Body from(String bodyText) {
         return new Body(bodyText.getBytes(DEFAULT_ENCODING));
+    }
+
+    public String asString() {
+        return new String(data, DEFAULT_ENCODING);
     }
 
     @Override
@@ -28,5 +32,12 @@ public class Body {
     @Override
     public int hashCode() {
         return Arrays.hashCode(data);
+    }
+
+    @Override
+    public String toString() {
+        return "Body{" +
+                "data=" + new String(data) +
+                '}';
     }
 }
