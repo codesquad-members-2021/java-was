@@ -1,0 +1,49 @@
+package webserver;
+
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.net.Socket;
+
+import core.HttpRequest;
+import core.HttpResponse;
+import handler.mapping.MappingUrlHandler;
+import handler.returnValueHandle.ReturnValueHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class WebCat extends Thread {
+
+    private static final Logger log = LoggerFactory.getLogger(WebCat.class);
+
+    private Socket connection;
+
+    public WebCat(Socket connectionSocket) {
+        this.connection = connectionSocket;
+    }
+
+    public void run() {
+        log.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
+
+        try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
+            HttpRequest httpRequest = new HttpRequest(in);
+            httpRequest.run();
+            HttpResponse httpResponse = new HttpResponse(out);
+            MappingUrlHandler mappingUrlHandler = new MappingUrlHandler(httpRequest.getMethod(), httpRequest.getUrl());
+            DataOutputStream dos = new DataOutputStream(out);
+            try {
+                Object returnValue = mappingUrlHandler.invokeMethod(httpRequest, httpResponse);
+                //TODO 여기서 returnValue 를 resolve 하는 방식을 찾아야 한다.
+                ReturnValueHandler returnValueHandler = new ReturnValueHandler(returnValue, dos);
+                returnValueHandler.handle();
+            } catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchMethodException | InstantiationException e) {
+                e.printStackTrace();
+            }
+            log.info(httpRequest.toString());
+            log.info(httpResponse.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+}
