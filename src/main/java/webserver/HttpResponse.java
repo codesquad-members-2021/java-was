@@ -11,8 +11,16 @@ import java.util.Map;
 
 public class HttpResponse {
     private static final Logger log = LoggerFactory.getLogger(HttpResponse.class);
-    private Map<String, String> headers = new HashMap<>();
-    private DataOutputStream dos;
+
+    private static final Map<String, String> EXTENSIONS = new HashMap<>();
+    private final Map<String, String> headers = new HashMap<>();
+    private final DataOutputStream dos;
+
+    static {
+        EXTENSIONS.put(".css", "text/css");
+        EXTENSIONS.put(".js", "application/javascript");
+        EXTENSIONS.put(".html", "text/html");
+    }
 
     public HttpResponse(OutputStream out) {
         this.dos = new DataOutputStream(out);
@@ -24,18 +32,9 @@ public class HttpResponse {
 
     public void forward(String url) throws IOException {
         byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-        if (url.endsWith(".css")) {
-            response200Header(body.length, "text/css");
-        } else if (url.endsWith(".js")) {
-            response200Header(body.length, "application/javascript");
-        } else {
-            response200Header(body.length, "text/html");
-        }
+        String extension = url.substring(url.lastIndexOf("."));
+        response200Header(body.length, EXTENSIONS.get(extension));
         responseBody(body);
-    }
-
-    public void forwardBody(String string) {
-
     }
 
     public void response200Header(int lengthOfBodyContent, String contentType) {
