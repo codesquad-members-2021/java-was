@@ -58,7 +58,7 @@ public abstract class Header {
         return statusLineAttributes;
     }
 
-    public byte[] toByte() {
+    public byte[] getBytes() {
         StringBuilder sb = new StringBuilder();
 
         sb.append(statusLine()).append(System.lineSeparator());
