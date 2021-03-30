@@ -40,7 +40,7 @@ public class PostMessage implements RequestMessage {
     @Override
     public Map<String, String> getParameters() {
         try {
-            String decode = URLDecoder.decode(body.asString(), StandardCharsets.UTF_8.name());
+            String decode = URLDecoder.decode(body.getString(), StandardCharsets.UTF_8.name());
             return HttpRequestUtils.parseQueryString(decode);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException("인코딩 오류", e);

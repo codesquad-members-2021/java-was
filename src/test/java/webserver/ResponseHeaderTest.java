@@ -60,9 +60,9 @@ class ResponseHeaderTest {
     }
 
     @ParameterizedTest
-    @MethodSource("toByte")
-    void toByte(String headerText, byte[] expectedHeaderByte) {
-        byte[] headerByte = Header.responseHeaderFrom(headerText).toByte();
+    @MethodSource("getBytes")
+    void getBytes(String headerText, byte[] expectedHeaderByte) {
+        byte[] headerByte = Header.responseHeaderFrom(headerText).getBytes();
 
         assertAll(
                 () -> assertThat(headerByte).isEqualTo(expectedHeaderByte),
@@ -70,7 +70,7 @@ class ResponseHeaderTest {
         );
     }
 
-    static Stream<Arguments> toByte() {
+    static Stream<Arguments> getBytes() {
         return Stream.of(
                 Arguments.of(
                         "HTTP/1.1 200 OK" + System.lineSeparator() +

@@ -17,8 +17,12 @@ public class Body {
         return new Body(bodyText.getBytes(DEFAULT_ENCODING));
     }
 
-    public String asString() {
+    public String getString() {
         return new String(data, DEFAULT_ENCODING);
+    }
+
+    public byte[] getBytes() {
+        return data;
     }
 
     @Override
