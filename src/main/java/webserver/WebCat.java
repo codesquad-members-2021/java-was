@@ -32,13 +32,14 @@ public class WebCat extends Thread {
             DataOutputStream dos = new DataOutputStream(out);
             if(httpRequest.getUrl().contains(".")) {
                 ReturnValueHandler.responseStaticFile(dos, httpRequest.getUrl());
+                return;
             }
             try {
                 Object returnValue = mappingUrlHandler.invokeMethod(httpRequest, httpResponse);
                 ReturnValueHandler returnValueHandler = new ReturnValueHandler(returnValue, dos);
                 returnValueHandler.handle();
             } catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchMethodException | InstantiationException e) {
-                e.printStackTrace();
+
             }
             log.info(httpRequest.toString());
             log.info(httpResponse.toString());

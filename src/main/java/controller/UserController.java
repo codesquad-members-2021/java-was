@@ -33,6 +33,7 @@ public class UserController {
     public String createUser(HttpRequest httpRequest, HttpResponse httpResponse) {
 
         final Map<String, String> parameters = httpRequest.getRequestBody();
+        log.info("parameters : {}", parameters);
 
         User user = new User(parameters.get("userId"), parameters.get("password"), parameters.get("name"), parameters.get("email"));
         log.debug("User : {}" , user);
@@ -45,8 +46,7 @@ public class UserController {
 
     @GetMapping(url = "/users")
     public String getUsers(HttpRequest httpRequest, HttpResponse httpResponse) {
-        log.info("12312312312");
-        return "index.html";
+        return "list.html";
     }
 
     @GetMapping(url = "/users/form")
