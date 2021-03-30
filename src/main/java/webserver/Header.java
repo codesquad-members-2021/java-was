@@ -25,24 +25,14 @@ public abstract class Header {
         String[] splittedHeaderTexts = headerText.split(System.lineSeparator());
         List<String> statusLine = HttpRequestUtils.parseStatusLine(splittedHeaderTexts[0]);
 
-        Map<String, String> statusLineAttributes = new HashMap<>();
-        statusLineAttributes.put(RequestHeader.METHOD_KEY, statusLine.get(0));
-        statusLineAttributes.put(RequestHeader.PATH_KEY, statusLine.get(1));
-        statusLineAttributes.put(PROTOCOL_VERSION_KEY, statusLine.get(2));
-
-        return new RequestHeader(statusLineAttributes, attributeFrom(headerText));
+        return RequestHeader.of(statusLine, attributeFrom(headerText));
     }
 
     public static ResponseHeader responseHeaderFrom(String headerText) {
         String[] splittedHeaderTexts = headerText.split(System.lineSeparator());
         List<String> statusLine = HttpRequestUtils.parseStatusLine(splittedHeaderTexts[0]);
 
-        Map<String, String> statusLineAttributes = new HashMap<>();
-        statusLineAttributes.put(PROTOCOL_VERSION_KEY, statusLine.get(0));
-        statusLineAttributes.put(ResponseHeader.STATUS_CODE_KEY, statusLine.get(1));
-        statusLineAttributes.put(ResponseHeader.STATUS_TEXT_KEY, statusLine.get(2));
-
-        return new ResponseHeader(statusLineAttributes, attributeFrom(headerText));
+        return ResponseHeader.of(statusLine, attributeFrom(headerText));
     }
 
     private static Map<String, String> attributeFrom(String headerText) {
