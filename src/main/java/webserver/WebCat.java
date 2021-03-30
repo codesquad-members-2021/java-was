@@ -39,7 +39,7 @@ public class WebCat extends Thread {
                 ReturnValueHandler returnValueHandler = new ReturnValueHandler(returnValue, dos);
                 returnValueHandler.handle();
             } catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchMethodException | InstantiationException e) {
-
+                e.printStackTrace();
             }
             log.info(httpRequest.toString());
             log.info(httpResponse.toString());
