@@ -16,10 +16,10 @@ class HttpRequestTest {
         InputStream in = new FileInputStream(testDirectory + "Http_GET.txt");
         HttpRequest request = new HttpRequest(in);
 
-        assertThat("GET").isEqualTo(request.getMethod().name());
-        assertThat("/user/create").isEqualTo(request.getPath());
-        assertThat("keep-alive").isEqualTo(request.getHeader("Connection"));
-        assertThat("javajigi").isEqualTo(request.getParameter("userId"));
+        assertThat(request.getMethod().name()).isEqualTo("GET");
+        assertThat(request.getPath()).isEqualTo("/user/create");
+        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
+        assertThat(request.getParameter("userId")).isEqualTo("javajigi");
     }
 
     @Test
@@ -27,10 +27,21 @@ class HttpRequestTest {
         InputStream in = new FileInputStream(testDirectory + "Http_POST.txt");
         HttpRequest request = new HttpRequest(in);
 
-        assertThat("POST").isEqualTo(request.getMethod().name());
-        assertThat("/user/create").isEqualTo(request.getPath());
-        assertThat("keep-alive").isEqualTo(request.getHeader("Connection"));
-        assertThat("javajigi").isEqualTo(request.getParameter("userId"));
+        assertThat(request.getMethod().name()).isEqualTo("POST");
+        assertThat(request.getPath()).isEqualTo("/user/create");
+        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
+        assertThat(request.getParameter("userId")).isEqualTo("javajigi");
     }
 
+    @Test
+    public void request_POST2() throws Exception {
+        InputStream in = new FileInputStream(testDirectory + "Http_POST2.txt");
+        HttpRequest request = new HttpRequest(in);
+
+        assertThat(request.getMethod().name()).isEqualTo("POST");
+        assertThat(request.getPath()).isEqualTo("/user/create");
+        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
+        assertThat(request.getParameter("id")).isEqualTo("1");
+        assertThat(request.getParameter("userId")).isEqualTo("javajigi");
+    }
 }
