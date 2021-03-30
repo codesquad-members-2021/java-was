@@ -16,7 +16,8 @@ public class HttpRequest {
     private String requestLine;
     private Map<String, String> headers;
     private BufferedReader br;
-    private String RequestBody;
+    private String RequestBody = "";
+    private String queryString = "";
     private Map<String, String> parameters;
 
     public HttpRequest(InputStream in) {
@@ -39,15 +40,16 @@ public class HttpRequest {
                     headers.put(headerTokens[0], headerTokens[1]);
                 }
             }
-            if (headers.get("Content-Length") == null) {
-                String tokens = requestLine.split(" ")[1];
-                String queryString = tokens.substring(tokens.indexOf("?") + 1);
-                parameters = HttpRequestUtils.parseQueryString(queryString);
+
+            String[] tokens = requestLine.split(" ");
+            if (tokens[1].contains("?")) {
+                queryString = tokens[1].substring(tokens[1].indexOf("?") + 1);
             }
             if (headers.get("Content-Length") != null) {
                 RequestBody = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
-                parameters = HttpRequestUtils.parseQueryString(RequestBody);
             }
+            parameters = HttpRequestUtils.parseQueryString(queryString + "&" + RequestBody);
+
             log.info("parameters : {}", parameters.toString());
         } catch (IOException e) {
             e.printStackTrace();

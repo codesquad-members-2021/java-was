@@ -1,6 +1,6 @@
 HTTP/1.1 200 OK 
-Content-Type: text/html;charset=utf-8
-Content-Length: 7049
+Content-Type:text/html;charset=utf-8
+Content-Length: 6892
 
 <!DOCTYPE html>
 <html lang="kr">
@@ -44,7 +44,7 @@ Content-Length: 7049
                   <li><a href="https://facebook.com" target="_blank">Facebook</a></li>
                 </ul>
              </li>
-             <li><a href="./user/list.html"><i class="glyphicon glyphicon-user"></i></a></li>
+             <li><a href="/list"><i class="glyphicon glyphicon-user"></i></a></li>
            </ul>
         </div>	
      </div>	
