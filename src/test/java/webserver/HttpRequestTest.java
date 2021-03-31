@@ -1,15 +1,13 @@
 package webserver;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.*;
+import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
+import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class HttpRequestTest {
@@ -23,10 +21,10 @@ class HttpRequestTest {
         InputStream in = new FileInputStream(testDirectory + "Http_GET.txt");
         HttpRequest request = new HttpRequest(in);
 
-        assertThat(request.getMethod().name()).isEqualTo("GET");
-        assertThat(request.getPath()).isEqualTo("/user/create");
-        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
-        assertThat(request.getParameter("userId")).isEqualTo("javajigi");
+        softly.assertThat(request.getMethod().name()).isEqualTo("GET");
+        softly.assertThat(request.getPath()).isEqualTo("/user/create");
+        softly.assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
+        softly.assertThat(request.getParameter("userId")).isEqualTo("javajigi");
     }
 
     @Test
@@ -34,10 +32,10 @@ class HttpRequestTest {
         InputStream in = new FileInputStream(testDirectory + "Http_POST.txt");
         HttpRequest request = new HttpRequest(in);
 
-        assertThat(request.getMethod().name()).isEqualTo("POST");
-        assertThat(request.getPath()).isEqualTo("/user/create");
-        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
-        assertThat(request.getParameter("userId")).isEqualTo("javajigi");
+        softly.assertThat(request.getMethod().name()).isEqualTo("POST");
+        softly.assertThat(request.getPath()).isEqualTo("/user/create");
+        softly.assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
+        softly.assertThat(request.getParameter("userId")).isEqualTo("javajigi");
     }
 
     @Test
@@ -45,10 +43,10 @@ class HttpRequestTest {
         InputStream in = new FileInputStream(testDirectory + "Http_POST2.txt");
         HttpRequest request = new HttpRequest(in);
 
-        assertThat(request.getMethod().name()).isEqualTo("POST");
-        assertThat(request.getPath()).isEqualTo("/user/create");
-        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
-        assertThat(request.getParameter("id")).isEqualTo("1");
-        assertThat(request.getParameter("userId")).isEqualTo("javajigi");
+        softly.assertThat(request.getMethod().name()).isEqualTo("POST");
+        softly.assertThat(request.getPath()).isEqualTo("/user/create");
+        softly.assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
+        softly.assertThat(request.getParameter("id")).isEqualTo("1");
+        softly.assertThat(request.getParameter("userId")).isEqualTo("javajigi");
     }
 }
