@@ -15,7 +15,7 @@ import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Map;
 
-public class ListUserController extends AbstractController {
+public class ListUserController extends BaseController {
     private static final Logger log = LoggerFactory.getLogger(ListUserController.class);
 
     @Override

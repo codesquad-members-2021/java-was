@@ -36,19 +36,16 @@ public class RequestHandler extends Thread {
             HttpRequest httpRequest = new HttpRequest(in);
             HttpResponse httpResponse = new HttpResponse(out);
 
-            HttpMethod method = httpRequest.getMethod();
-            log.info("Http Method: {}", method.name());
             String url = httpRequest.getPath();
-            log.info("path : {}", url);
             if (!CONTROLLER_MAP.containsKey(url)) {
                 httpResponse.forward(url);
                 return;
             }
+
             Controller controller = CONTROLLER_MAP.get(url);
             controller.service(httpRequest, httpResponse);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
-
     }
 }

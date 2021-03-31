@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
 
-public class CreateUserController extends AbstractController {
+public class CreateUserController extends BaseController {
     private static final Logger log = LoggerFactory.getLogger(CreateUserController.class);
 
     @Override

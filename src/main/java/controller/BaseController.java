@@ -4,7 +4,7 @@ import webserver.HttpMethod;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
 
-public abstract class AbstractController implements Controller {
+public class BaseController implements Controller {
 
     @Override
     public void service(HttpRequest request, HttpResponse response) {

@@ -1,15 +1,22 @@
 package webserver;
 
+import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 
 import java.io.FileInputStream;
 import java.io.InputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(SoftAssertionsExtension.class)
 class HttpRequestTest {
+    private final String testDirectory = "./src/test/resources/";
 
-    private String testDirectory = "./src/test/resources/";
+    @InjectSoftAssertions
+    SoftAssertions softly;
 
     @Test
     public void request_GET() throws Exception {
