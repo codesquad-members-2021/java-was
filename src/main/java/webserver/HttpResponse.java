@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.DataOutputStream;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +35,12 @@ public class HttpResponse {
         byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
         String extension = url.substring(url.lastIndexOf("."));
         response200Header(body.length, EXTENSIONS.get(extension));
+        responseBody(body);
+    }
+
+    public void forwardBody(String result) {
+        byte[] body = result.getBytes(StandardCharsets.UTF_8);
+        response200Header(body.length, "text/html");
         responseBody(body);
     }
 
