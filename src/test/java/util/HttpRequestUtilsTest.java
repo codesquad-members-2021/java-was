@@ -3,26 +3,17 @@ package util;
 import java.util.Map;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
+import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import util.HttpRequestUtils.Pair;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+@ExtendWith(SoftAssertionsExtension.class)
 class HttpRequestUtilsTest {
 
+    @InjectSoftAssertions
     SoftAssertions softly;
-
-    @BeforeEach
-    void buildSoftAssertions() {
-        softly = new SoftAssertions();
-    }
-
-    @AfterEach
-    void afterEach() {
-        softly.assertAll();
-    }
 
     @Test
     void parseQueryString() {
@@ -46,7 +37,7 @@ class HttpRequestUtilsTest {
         softly.assertThat(parameters.isEmpty()).isTrue();
 
         parameters = HttpRequestUtils.parseQueryString(" ");
-       softly.assertThat(parameters.isEmpty()).isTrue();
+        softly.assertThat(parameters.isEmpty()).isTrue();
     }
 
     @Test
