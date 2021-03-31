@@ -1,6 +1,7 @@
 package controller;
 
 import db.DataBase;
+import db.SessionDataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,44 +20,55 @@ public class ListUserController extends AbstractController {
 
     @Override
     public void doGet(HttpRequest request, HttpResponse response) {
-        String cookies = request.getHeader("Cookie");
-        Map<String, String> cookieStringMap = HttpRequestUtils.parseCookies(cookies);
-        log.info("Cookie: {}", cookieStringMap.toString());
-        if (cookieStringMap.get("logined").equals("false")) {
+        String sessionId = request.getHeader("Cookie");
+        if (!isLogin(sessionId)) {
             response.sendRedirect("/user/login.html");
         } else {
-            String url = "/user/list.html";
-            byte[] body = new byte[0];
-            try {
-                body = Files.readAllBytes(new File("./webapp" + url).toPath());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            String bodyStr = new String(body);
-            int tbodyIndex = bodyStr.indexOf("<tbody>");
-            log.info("bodyStr : {}", bodyStr.substring(0, tbodyIndex + 7));
-
-            StringBuilder result = new StringBuilder(bodyStr.substring(0, tbodyIndex + 7));
-            Collection<User> users = DataBase.findAll();
-            int id = 0;
-            for (User user : users) {
-                id++;
-                result.append("<tr><th scope=\"row\">")
-                        .append(id).append("</th> <td>")
-                        .append(user.getUserId()).append("</td> <td>")
-                        .append(user.getName()).append("</td> <td>")
-                        .append(user.getEmail()).append("</td> <td>")
-                        .append("<a href=\"#\" class=\"btn btn - success\" role=\"button\">수정</a></td>");
-            }
-            result.append(bodyStr.substring(tbodyIndex + 7));
-            log.info("result: {}", result.toString());
-            response.response200Header(result.toString().getBytes().length, "text/html");
-            response.responseBody(result.toString().getBytes());
+            String body = getBody("/user/list.html");
+            int tbodyIndex = body.indexOf("<tbody>");
+            String result = addUserList(body, tbodyIndex).toString();
+            response.forwardBody(result);
         }
     }
 
-    public boolean isLogin(String id) {
+    private boolean isLogin(String id) {
+        Map<String, String> cookieStringMap = HttpRequestUtils.parseCookies(id);
+        log.info("Cookie: {}", cookieStringMap.toString());
+        return SessionDataBase.isLoginUser(cookieStringMap.get("JSESSIONID"));
+    }
 
-        return false;
+    private String getBody(String url) {
+        byte[] body = new byte[0];
+        try {
+            body = Files.readAllBytes(new File("./webapp" + url).toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new String(body);
+    }
+
+    private StringBuilder processUserList(String body, int tbodyIndex) {
+        StringBuilder result = new StringBuilder(body.substring(0, tbodyIndex + 7));
+        Collection<User> users = DataBase.findAll();
+        int id = 0;
+        for (User user : users) {
+            id++;
+            result.append("<tr><th scope=\"row\">")
+                    .append(id)
+                    .append("</th> <td>")
+                    .append(user.getUserId())
+                    .append("</td> <td>")
+                    .append(user.getName())
+                    .append("</td> <td>")
+                    .append(user.getEmail())
+                    .append("</td> <td>")
+                    .append("<a href=\"#\" class=\"btn btn - success\" role=\"button\">수정</a></td>");
+        }
+        return result;
+    }
+
+    private StringBuilder addUserList(String body, int tbodyIndex) {
+        StringBuilder result = processUserList(body, tbodyIndex);
+        return result.append(body.substring(tbodyIndex + 7));
     }
 }

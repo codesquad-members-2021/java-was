@@ -12,12 +12,17 @@ public class CreateUserController extends AbstractController {
 
     @Override
     public void doPost(HttpRequest request, HttpResponse response) {
+        User user = getUserFrom(request);
+        DataBase.addUser(user);
+        response.sendRedirect("/index.html");
+        log.debug("{}님이 회원가입에 성공하셨습니다.", user.getUserId());
+    }
+
+    private User getUserFrom(HttpRequest request) {
         String userId = request.getParameter("userId");
         String password = request.getParameter("password");
         String name = request.getParameter("name");
         String email = request.getParameter("email");
-        DataBase.addUser(new User(userId, password, name, email));
-        response.sendRedirect("/index.html");
-        log.debug("{}님이 회원가입에 성공하셨습니다.", userId);
+        return new User(userId, password, name, email);
     }
 }
