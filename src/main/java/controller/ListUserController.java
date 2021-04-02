@@ -1,10 +1,13 @@
 package controller;
 
+import annotation.RequestMapping;
+import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
 
 import java.io.IOException;
 
+@RequestMapping(path = "/user/list", method = HttpMethod.GET)
 public class ListUserController implements Controller {
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {

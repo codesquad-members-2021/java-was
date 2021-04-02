@@ -14,15 +14,13 @@ import org.slf4j.LoggerFactory;
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
-    private Map<ControllerKey, Controller> controllerMap;
-    private Controller defaultController;
     private Socket connection;
+    private HandlerAdapter adapter;
 
 
-    public RequestHandler(Socket connectionSocket, Map<ControllerKey, Controller> controllerMap, Controller defaultController) {
+    public RequestHandler(Socket connectionSocket,HandlerAdapter adapter) {
         this.connection = connectionSocket;
-        this.controllerMap = controllerMap;
-        this.defaultController = defaultController;
+        this.adapter = adapter;
     }
 
     public void run() {
@@ -33,8 +31,7 @@ public class RequestHandler extends Thread {
             HttpRequest httpRequest = HttpRequest.of(in);
             HttpResponse httpResponse = new HttpResponse(out);
 
-            ControllerKey controllerKey = new ControllerKey(httpRequest.method(), httpRequest.getUrl());
-            Controller controller = controllerMap.getOrDefault(controllerKey, defaultController);
+            Controller controller = adapter.controller(new ControllerKey(httpRequest.method(), httpRequest.getUrl()));
 
             controller.service(httpRequest, httpResponse);
 
