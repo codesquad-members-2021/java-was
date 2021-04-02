@@ -1,7 +1,9 @@
 package webserver;
 
+import annotation.RequestMapping;
 import controller.*;
 import http.HttpMethod;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class WebServer {
     private static final Logger log = LoggerFactory.getLogger(WebServer.class);
@@ -18,9 +21,18 @@ public class WebServer {
     private static final Map<ControllerKey, Controller> controllerMap = new HashMap<>();
 
     static {
-        controllerMap.put(new ControllerKey(HttpMethod.POST, "/user/create"), new CreateUserController());
-        controllerMap.put(new ControllerKey(HttpMethod.POST, "/user/login"), new LoginController());
-        controllerMap.put(new ControllerKey(HttpMethod.GET, "/user/list"), new ListUserController());
+
+        Reflections reflections = new Reflections("controller");
+        Set<Class<?>> requestMappingControllers = reflections.getTypesAnnotatedWith(RequestMapping.class);
+        for (Class<?> controller : requestMappingControllers) {
+            RequestMapping annotation = controller.getAnnotation(RequestMapping.class);
+            try {
+                controllerMap.put(new ControllerKey(annotation.method(), annotation.path()), (Controller) controller.newInstance());
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     public static void main(String args[]) throws Exception {
