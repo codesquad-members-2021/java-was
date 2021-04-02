@@ -1,12 +1,15 @@
 package controller;
 
+import annotation.RequestMapping;
 import db.DataBase;
+import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
 import model.User;
 
 import java.io.IOException;
 
+@RequestMapping(path = "/user/login", method = HttpMethod.POST)
 public class LoginController implements Controller {
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
