@@ -1,5 +1,6 @@
 package webserver;
 
+import http.HttpRequest;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.junit.jupiter.api.Test;

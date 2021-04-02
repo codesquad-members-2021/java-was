@@ -1,4 +1,4 @@
-package webserver;
+package http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,10 +77,6 @@ public class HttpRequest {
 
     public String getHeader(String fieldName) {
         return headers.get(fieldName);
-    }
-
-    public Map<String, String> headers() {
-        return headers;
     }
 
     public String getParameter(String fieldName) {

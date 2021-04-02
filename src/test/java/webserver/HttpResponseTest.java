@@ -1,5 +1,6 @@
 package webserver;
 
+import http.HttpResponse;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
