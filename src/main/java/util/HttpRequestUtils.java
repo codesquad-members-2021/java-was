@@ -3,6 +3,7 @@ package util;
 import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
@@ -10,8 +11,8 @@ import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
     /**
-     * @param queryString은
-     *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
+     * @param queryString
+     *            은 URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
      * @return
      */
     public static Map<String, String> parseQueryString(String queryString) {
@@ -19,7 +20,7 @@ public class HttpRequestUtils {
     }
 
     /**
-     * @param 쿠키
+     * @param cookies
      *            값은 name1=value1; name2=value2 형식임
      * @return
      */
@@ -32,14 +33,14 @@ public class HttpRequestUtils {
             return Maps.newHashMap();
         }
         String[] tokens = values.split(separator);
-        return Arrays.stream(tokens).map(t -> getKeyValue(t, "=")).filter(p -> p != null)
-                .collect(Collectors.toMap(p -> p.getKey(), p -> {
+        return Arrays.stream(tokens).map(t -> getKeyValue(t, "=")).filter(Objects::nonNull)
+                .collect(Collectors.toMap(Pair::getKey, p -> {
                     try {
                         return URLDecoder.decode(p.getValue(), "UTF-8");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    return null;
+                    return p.getValue();
                 }));
     }
 

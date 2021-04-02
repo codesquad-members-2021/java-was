@@ -1,18 +1,27 @@
-package webserver;
+package http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.DataOutputStream;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
     private static final Logger log = LoggerFactory.getLogger(HttpResponse.class);
-    private Map<String, String> headers = new HashMap<>();
-    private DataOutputStream dos;
+
+    private static final Map<String, String> EXTENSIONS = new HashMap<>();
+    private final Map<String, String> headers = new HashMap<>();
+    private final DataOutputStream dos;
+
+    static {
+        EXTENSIONS.put(".css", "text/css");
+        EXTENSIONS.put(".js", "application/javascript");
+        EXTENSIONS.put(".html", "text/html");
+    }
 
     public HttpResponse(OutputStream out) {
         this.dos = new DataOutputStream(out);
@@ -24,33 +33,21 @@ public class HttpResponse {
 
     public void forward(String url) throws IOException {
         byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-        if (url.endsWith(".css")) {
-            response200HeaderWithCss(body.length);
-        } else {
-            response200Header(body.length);
-        }
+        String extension = url.substring(url.lastIndexOf("."));
+        response200Header(body.length, EXTENSIONS.get(extension));
         responseBody(body);
     }
 
-    public void forwardBody(String string) {
-
+    public void forwardBody(String result) {
+        byte[] body = result.getBytes(StandardCharsets.UTF_8);
+        response200Header(body.length, "text/html");
+        responseBody(body);
     }
 
-    public void response200HeaderWithCss(int lengthOfBodyContent) {
+    public void response200Header(int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    public void response200Header(int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type:" + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
@@ -73,7 +70,7 @@ public class HttpResponse {
             processHeaders();
             dos.writeBytes("Location: " + url + "\r\n");
         } catch (IOException e) {
-
+            e.printStackTrace();
         }
     }
 
