@@ -1,35 +1,14 @@
-# 자바 웹 서버 (Pyroach Team)
+# 자바 웹 서버
 
-## 짝 프로그래밍(Pair-Programming) 진행 방식
+## 진행 방법
 
-- 처음에는 서로 어떻게 설계할 것인지 이야기를 나눈뒤 코딩을 시작한다.
-- 5분 단위로 짝 프로그래밍을 번갈아 가면서 시행한다.
-- 총 짝 프로그래밍 시간은 적당히 2시간 정도? 혹은 재량껏 진행한다.
-- 네비게이터는 최대한 요구사항을 준수할 수 있도록 드라이버를 안내한다.
+* 요구사항에 대한 구현을 완료한 후 자신의 **github 아이디**에 해당하는 브랜치에 Pull Request(이하 PR)를 통해 코드 리뷰 요청을 한다.
+* 마지막 커밋에서 새로운 브랜치를 만들고 다음 단계 작업을 진행한다.
+* 코드 리뷰 피드백에 대한 개선 작업을 한다.
+* 코드 리뷰 완료시 upstream fetch 및 rebase를 진행한다. 충돌이 날 경우가 많으므로 잘 해결한다.
+* <옵션> 충돌로 인해 rebase 해결이 어려울 경우 merge를 이용해서 해결한다.
+* 반복적으로 프로젝트를 진행한다.
 
-## Commit Convention
-
-```
-[# 이슈 번호] [type] [:emoji:] [title]
-
-contents..
-```
-
-## Commit Message Icon
-
-|Commit Type|Emoji|Type|
-|---:|:---:|---|
-|BugFix|:bug: `:bug:`| bug: |
-|Documentation|:books:`:books`| doc: |
-|Documenting Source Code|:bulb:`:bulb`| doc: |
-|Performance|:racehors:`:racehors:`| perf: |
-|Adding a Test|:white_check_mark:`:white_check_mark:`| test: |
-|Refactoring Code|:recycle:`:recycle:`| refactor: |
-|Docker|:whale:`:whale:`| infra: |
-|Update README File|:pencil:`:pencil:`| text: |
-|Need Refactoring|:hankey:`:hankey:`|
-|Add CI Build System|:construction_worker:`:construction_worker:`| infra: |
-|Deploying Stuff|:rocket:`:rocket:`| infra: |
-|Add Dependency|:package:`:package:`| setup: |
-|Featuring New Function|:cloud:`:cloud:`| feat: |
-
+## 온라인 코드 리뷰 과정
+* [텍스트와 이미지로 살펴보는 코드스쿼드의 온라인 코드 리뷰 과정](https://github.com/code-squad/codesquad-docs/blob/master/codereview/README.md)
+* [동영상으로 살펴보는 코드스쿼드의 온라인 코드 리뷰 과정](https://youtu.be/a5c9ku-_fok)
