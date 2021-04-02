@@ -2,11 +2,12 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.util.List;
+import java.util.Map;
 
-import db.DataBase;
-import model.User;
+import controller.Controller;
+import controller.ControllerKey;
+import http.HttpRequest;
+import http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +15,12 @@ public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
+    private HandlerAdapter adapter;
 
-    public RequestHandler(Socket connectionSocket) {
+
+    public RequestHandler(Socket connectionSocket,HandlerAdapter adapter) {
         this.connection = connectionSocket;
+        this.adapter = adapter;
     }
 
     public void run() {
@@ -24,99 +28,16 @@ public class RequestHandler extends Thread {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             HttpRequest httpRequest = HttpRequest.of(in);
-            String url = httpRequest.getUrl();
+            HttpResponse httpResponse = new HttpResponse(out);
 
+            Controller controller = adapter.controller(new ControllerKey(httpRequest.method(), httpRequest.getUrl()));
 
-            DataOutputStream dos = new DataOutputStream(out);
-            if ("/user/create".equals(url)) {
-                User user = new User(
-                        httpRequest.data("userId"),
-                        httpRequest.data("password"),
-                        httpRequest.data("name"),
-                        httpRequest.data("email")
-                );
-                DataBase.addUser(user);
-                log.debug("user : {}", user);
-                response302Header(dos, "/index.html");
-            } else if ("/user/login".equals(url)) {
-                User user = DataBase.findUserById(httpRequest.data("userId"));
-                if (user == null) {
-                    log.debug("Not Found");
-                    response302HeaderWithCookie(dos, "/user/login_failed.html", "logined=false", "/");
-                } else if (user.checkPassword(httpRequest.data("password"))) {
-                    log.debug("Login success");
-                    response302HeaderWithCookie(dos, "/index.html", "logined=true", "/");
-                } else {
-                    log.debug("Password was not matched");
-                    response302HeaderWithCookie(dos, "/user/login_failed.html", "logined=false", "/");
-                }
-            } else if ("/user/list".equals(url)) {
-                log.debug("Cookie : {}", httpRequest.header("Cookie"));
-                if ("true".equals(httpRequest.cookie("logined"))) {
-                    byte[] body = Files.readAllBytes(new File("./webapp" + "/user/list.html").toPath());
-                    response200Header(dos, body.length, "html");
-                    responseBody(dos, body);
-                } else {
-                    response302Header(dos, "/user/login.html");
-                }
-            } else {
-                log.debug("Cookie : {}", httpRequest.header("Cookie"));
-                byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-
-                if (url.endsWith(".css")){
-                    response200Header(dos, body.length, "css");
-                }else {
-                    response200Header(dos, body.length, "html");
-                }
-
-                responseBody(dos, body);
-            }
+            controller.service(httpRequest, httpResponse);
 
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
 
-    private void response302HeaderWithCookie(DataOutputStream dos, String url, String cookie, String cookiePath) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: " + url + "\r\n");
-            dos.writeBytes("Set-Cookie: " + cookie + "; Path=" + cookiePath + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void response302Header(DataOutputStream dos, String url) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: " + url + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/" + contentType + ";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
 }
