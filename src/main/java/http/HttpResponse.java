@@ -23,11 +23,12 @@ public class HttpResponse {
         startLine = "HTTP/1.1 200 OK \r\n";
         byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
 
+        String contentTypeValue = "text/html;charset=utf-8";
         if (url.endsWith(".css")) {
-            addHeader("Content-Type", "text/css;charset=utf-8");
-        } else {
-            addHeader("Content-Type", "text/html;charset=utf-8");
+            contentTypeValue = "text/css;charset=utf-8";
         }
+
+        addHeader("Content-Type", contentTypeValue);
         addHeader("Content-Length", String.valueOf(body.length));
 
         processHeaders();
